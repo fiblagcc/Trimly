@@ -105,14 +105,26 @@ Detailed per-step prompts: `docs/AGENT_PROMPTS.md`. Design build/polish: `docs/D
   messages in `GIT_SETUP.md` §3; e.g. one `fix:` that admits the RLS bug. Don't fake timestamps.
 - Repo isn't initialized yet — `git init` + set the single-author config before committing.
 
-## Current scaffold state (step 1 partially started)
+## Current state (all 9 steps built + verified live — 2026-06-01)
 
-Present: `package.json` (deps installed), `src/lib/supabase.ts`, `src/App.tsx` (route
-shell, QueryClientProvider, unguarded routes), `src/index.css` (theme tokens + utilities),
-`src/layouts/AppLayout.tsx`, placeholder pages (`Login`, `Client`, `Barber`, `Admin`
-dashboards), `src/components/TrimlyLogo.tsx` + `TrimlyMark.tsx` (⚠️ hand-drawn, rebuild
-from `docs/logo.svg`), `src/components/ui/button.tsx`. Still to finish in step 1: real
-logo from asset, favicon, font `<link>`, fix `.gitignore`, init git.
+All 9 build steps are complete, committed (clean single-author history, no AI trailers),
+and verified against the live Supabase project `madsedhycdiattoaypyl`:
+- Migration `supabase/migrations/0001_init.sql` and `supabase/seed.sql` are APPLIED to the
+  live DB. Demo accounts work (`client@`/`barber@`/`admin@trimly.demo` / `trimly123`).
+- **Checkpoint 1 (RLS) PASSED** — `node scripts/rls-check.mjs` (client A can't read B's data).
+- **Full E2E PASSED 12/12** — `node scripts/verify-e2e.mjs` (search → book → realtime →
+  directions → subscription gate → admin tickets/report). Both scripts read the access
+  token from a `SUPABASE_ACCESS_TOKEN` line in the gitignored `.env`.
+- Logo is the genuine wordmark from `docs/logo.svg` (generated to inline paths via
+  `scripts/gen-logo.mjs`), recolored via token; favicon is the square 'T' mark.
+
+Gotcha worth remembering: inserting into `auth.users` via SQL must set the four no-default
+token columns (`confirmation_token`, `recovery_token`, `email_change_token_new`,
+`email_change`) to `''`, or GoTrue rejects sign-in with "Database error querying schema".
+
+**Only remaining work:** push to GitHub (`https://github.com/fiblagcc/Trimly.git` — no
+remote added yet; needs the user's GitHub auth) and deploy to Vercel (needs the user's
+Vercel account + the two `VITE_` env vars). `vercel.json` already handles SPA routing.
 
 ## Working agreement
 

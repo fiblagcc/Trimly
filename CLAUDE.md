@@ -122,9 +122,14 @@ Gotcha worth remembering: inserting into `auth.users` via SQL must set the four 
 token columns (`confirmation_token`, `recovery_token`, `email_change_token_new`,
 `email_change`) to `''`, or GoTrue rejects sign-in with "Database error querying schema".
 
-**Only remaining work:** push to GitHub (`https://github.com/fiblagcc/Trimly.git` — no
-remote added yet; needs the user's GitHub auth) and deploy to Vercel (needs the user's
-Vercel account + the two `VITE_` env vars). `vercel.json` already handles SPA routing.
+**Shipped:** pushed to GitHub at https://github.com/fiblagcc/Trimly (public, `main`), and
+deployed to Vercel — live at **https://trimly-pearl-seven.vercel.app** (Vercel project
+`fakhrul-bhuiyan-s-projects/trimly`, both `VITE_` env vars set on Production, SPA routing
+via `vercel.json`, Supabase URL confirmed baked into the bundle). Re-deploy with
+`vercel deploy --prod`; GitHub pushes use the `gh` credential helper (logged in as `fiblagcc`).
+
+Tokens to rotate when convenient (all passed through chat, none committed): the Supabase
+PAT (`trimly-claude`, lives in gitignored `.env`) and the Vercel/gh OAuth sessions.
 
 ## Working agreement
 

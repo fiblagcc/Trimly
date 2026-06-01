@@ -17,6 +17,15 @@ const ROLE_OPTIONS: { value: Role; label: string; hint: string }[] = [
   { value: 'admin', label: 'Admin', hint: 'Support and reporting' },
 ]
 
+// Never let an auth call hang the form forever. If the network or auth lock stalls,
+// reject after a bounded wait so the button recovers and shows a clear message.
+function withTimeout<T>(p: Promise<T>, ms: number, message: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(message)), ms)),
+  ])
+}
+
 export function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -58,11 +67,15 @@ export function LoginPage() {
     setSubmitting(true)
     try {
       if (mode === 'signup') {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { role, full_name: fullName.trim() } },
-        })
+        const { data, error } = await withTimeout(
+          supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { role, full_name: fullName.trim() } },
+          }),
+          15000,
+          'Sign up is taking too long. Check your connection and try again.'
+        )
         if (error) throw error
         // If email confirmation is off, a session is returned and onAuthStateChange
         // will redirect. If it's on, prompt the user to confirm.
@@ -71,7 +84,11 @@ export function LoginPage() {
           setMode('login')
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        const { error } = await withTimeout(
+          supabase.auth.signInWithPassword({ email, password }),
+          12000,
+          'Sign in is taking too long. Check your connection and try again.'
+        )
         if (error) throw error
         // Redirect handled by the effect once the profile resolves.
       }

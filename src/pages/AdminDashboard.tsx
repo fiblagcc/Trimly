@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { toast } from 'sonner'
 import { useTickets, useUpdateTicketStatus, useReport } from '@/lib/admin'
 import type { TicketStatus } from '@/lib/types'
@@ -44,8 +43,9 @@ export function AdminDashboard() {
 
 // ── Report ────────────────────────────────────────────────────────────────────
 function ReportSection() {
-  const [generated, setGenerated] = React.useState(false)
-  const { data, isFetching, refetch } = useReport(generated)
+  // Load the snapshot on mount so the admin landing shows real counts immediately,
+  // instead of an empty card. The button refreshes it.
+  const { data, isFetching, refetch } = useReport(true)
 
   const metrics = [
     { label: 'Total bookings', value: data?.totalBookings },
@@ -58,24 +58,12 @@ function ReportSection() {
     <section>
       <div className="flex items-center justify-between gap-4">
         <p className="label-section">Report</p>
-        <Button
-          variant={generated ? 'outline' : 'default'}
-          size="sm"
-          onClick={() => {
-            setGenerated(true)
-            if (generated) refetch()
-          }}
-          disabled={isFetching}
-        >
-          {isFetching ? 'Generating…' : generated ? 'Refresh' : 'Generate report'}
+        <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+          {isFetching ? 'Refreshing…' : 'Refresh'}
         </Button>
       </div>
 
-      {!generated ? (
-        <div className="editorial-card mt-4 text-ink/70">
-          Generate a report to see current platform counts.
-        </div>
-      ) : (
+      {(
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((m) => (
             <div key={m.label} className="editorial-card">

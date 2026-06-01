@@ -17,6 +17,10 @@ const ROLE_OPTIONS: { value: Role; label: string; hint: string }[] = [
   { value: 'admin', label: 'Admin', hint: 'Support and reporting' },
 ]
 
+// Barbershop brand panel image (Unsplash License, verified). Same shot as the landing.
+const LOGIN_IMAGE =
+  'https://images.unsplash.com/photo-1641318175316-795cd2db99f8?auto=format&fit=crop&w=1200&q=80'
+
 // Never let an auth call hang the form forever. If the network or auth lock stalls,
 // reject after a bounded wait so the button recovers and shows a clear message.
 function withTimeout<T>(p: Promise<T>, ms: number, message: string): Promise<T> {
@@ -101,15 +105,17 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-sand px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <Link to="/" aria-label="Trimly home">
-            <TrimlyLogo size="auth" />
-          </Link>
-        </div>
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Left: the form */}
+      <div className="flex items-center justify-center bg-sand px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <Link to="/" aria-label="Trimly home">
+              <TrimlyLogo size="auth" />
+            </Link>
+          </div>
 
-        <div className="editorial-card p-8">
+          <div className="editorial-card p-8">
           <div className="mb-6">
             <h1 className="heading-page">
               {mode === 'login' ? 'Welcome back' : 'Create your account'}
@@ -213,8 +219,28 @@ export function LoginPage() {
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>
           </p>
+          </div>
         </div>
       </div>
+
+      {/* Right: brand panel, the one dark surface for this layout. */}
+      <aside className="relative hidden lg:block">
+        <img
+          src={LOGIN_IMAGE}
+          alt="A barber at work in the chair"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-primary-dark/40 mix-blend-multiply" aria-hidden="true" />
+        <div className="absolute inset-0 bg-dark-anchor/40" aria-hidden="true" />
+        <div className="relative flex h-full flex-col justify-end p-12">
+          <p className="max-w-sm font-display text-4xl font-semibold leading-tight text-white">
+            Book a barber near you, skip the wait.
+          </p>
+          <p className="mt-4 max-w-xs text-white/70">
+            Real open times from real shops, confirmed in a tap.
+          </p>
+        </div>
+      </aside>
     </div>
   )
 }

@@ -2,10 +2,21 @@
 // Usage:  SUPABASE_ACCESS_TOKEN=sbp_... node scripts/db-apply.mjs supabase/migrations/0001_init.sql
 // The token is a Supabase Personal Access Token (Account → Access Tokens). It is read
 // from the environment only — never hard-code or commit it.
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 
 const PROJECT_REF = 'madsedhycdiattoaypyl'
-const token = process.env.SUPABASE_ACCESS_TOKEN
+
+// Token from the env var, or fall back to a SUPABASE_ACCESS_TOKEN line in .env
+// (which is gitignored, so the secret never enters chat or the repo).
+function tokenFromEnvFile() {
+  if (!existsSync('.env')) return undefined
+  const line = readFileSync('.env', 'utf8')
+    .split('\n')
+    .find((l) => l.trim().startsWith('SUPABASE_ACCESS_TOKEN='))
+  return line ? line.slice(line.indexOf('=') + 1).trim() : undefined
+}
+
+const token = process.env.SUPABASE_ACCESS_TOKEN || tokenFromEnvFile()
 const file = process.argv[2]
 
 if (!token) {

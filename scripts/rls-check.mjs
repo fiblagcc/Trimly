@@ -11,8 +11,6 @@ import { readFileSync } from 'node:fs'
 import { createClient } from '@supabase/supabase-js'
 
 const PROJECT_REF = 'madsedhycdiattoaypyl'
-const token = process.env.SUPABASE_ACCESS_TOKEN
-if (!token) { console.error('Missing SUPABASE_ACCESS_TOKEN'); process.exit(1) }
 
 const env = Object.fromEntries(
   readFileSync('.env', 'utf8').split('\n').filter(Boolean).map((l) => {
@@ -21,6 +19,9 @@ const env = Object.fromEntries(
 )
 const URL = env.VITE_SUPABASE_URL
 const ANON = env.VITE_SUPABASE_ANON_KEY
+// Token from env var or the gitignored .env (keeps the secret out of chat + repo).
+const token = process.env.SUPABASE_ACCESS_TOKEN || env.SUPABASE_ACCESS_TOKEN
+if (!token) { console.error('Missing SUPABASE_ACCESS_TOKEN'); process.exit(1) }
 
 async function sql(query) {
   const r = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/database/query`, {

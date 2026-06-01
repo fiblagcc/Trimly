@@ -1,5 +1,5 @@
 // Live end-to-end walk of the core loop against the Definition of Done, using the
-// seeded demo accounts through the anon client (RLS enforced) — exactly the browser path.
+// seeded demo accounts through the anon client (RLS enforced) - exactly the browser path.
 // Leaves the demo data pristine afterward (cleans up the test booking via the token).
 //   node scripts/verify-e2e.mjs
 import { readFileSync } from 'node:fs'
@@ -30,7 +30,7 @@ const mgmt = async (query) => {
 
 let pass = true
 const ok = (name, cond, detail) => {
-  console.log(`${cond ? 'PASS' : 'FAIL'} — ${name}${detail ? `  (${detail})` : ''}`)
+  console.log(`${cond ? 'PASS' : 'FAIL'} - ${name}${detail ? `  (${detail})` : ''}`)
   if (!cond) pass = false
 }
 

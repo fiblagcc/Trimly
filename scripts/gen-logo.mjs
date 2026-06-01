@@ -1,5 +1,5 @@
 // Extracts the exact path data from docs/logo.svg (the real Trimly wordmark) so the
-// React logo component renders the genuine mark — never a redrawn approximation.
+// React logo component renders the genuine mark - never a redrawn approximation.
 // Outputs:
 //   src/components/trimly-logo-paths.ts  (exact path 'd' strings, fill swapped to currentColor)
 //   public/favicon.svg                   (square mark: the 'T' glyph, white on brand teal)
@@ -19,7 +19,7 @@ console.log(`extracted ${ds.length} paths; viewBox="${vb}"`)
 
 // --- write paths module ---
 const tsBody =
-  `// AUTO-GENERATED from docs/logo.svg by scripts/gen-logo.mjs — do not edit by hand.\n` +
+  `// AUTO-GENERATED from docs/logo.svg by scripts/gen-logo.mjs - do not edit by hand.\n` +
   `// The genuine Trimly wordmark, exported as inline-SVG path data.\n` +
   `export const TRIMLY_VIEWBOX = '${vb}'\n\n` +
   `export const TRIMLY_PATHS: string[] = [\n` +

@@ -67,7 +67,7 @@ export function LoginPage() {
         // If email confirmation is off, a session is returned and onAuthStateChange
         // will redirect. If it's on, prompt the user to confirm.
         if (!data.session) {
-          toast.success('Account created — check your email to confirm, then sign in.')
+          toast.success('Account created. Check your email to confirm, then sign in.')
           setMode('login')
         }
       } else {
@@ -97,7 +97,7 @@ export function LoginPage() {
             <h1 className="heading-page">
               {mode === 'login' ? 'Welcome back' : 'Create your account'}
             </h1>
-            <p className="mt-1 text-sm text-ink/60">
+            <p className="mt-1 text-sm text-ink/70">
               {mode === 'login'
                 ? 'Sign in to manage your bookings.'
                 : 'Pick the kind of account you need.'}
@@ -168,7 +168,7 @@ export function LoginPage() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-ink/50">
+                <p className="text-xs text-ink/70">
                   {ROLE_OPTIONS.find((o) => o.value === role)?.hint}
                 </p>
               </fieldset>
@@ -183,7 +183,7 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-ink/60">
+          <p className="mt-6 text-center text-sm text-ink/70">
             {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
             <button
               type="button"

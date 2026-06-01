@@ -82,15 +82,15 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
 
   return (
     <div>
-      {/* Search hero — big type, asymmetric (left-aligned, not centered). */}
+      {/* Search hero - big type, asymmetric (left-aligned, not centered). */}
       <div className="max-w-2xl">
         <h1 className="heading-hero">Find a barber near you.</h1>
-        <p className="mt-4 text-lg text-ink/60">
+        <p className="mt-4 text-lg text-ink/70">
           Enter your ZIP code to see barbers taking bookings in your area.
         </p>
         <form onSubmit={onSearch} className="mt-6 flex max-w-md gap-3">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/55" />
             <Input
               aria-label="ZIP code"
               placeholder="e.g. 10001"
@@ -121,8 +121,8 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
         ) : !shops || shops.length === 0 ? (
           <div className="editorial-card max-w-md">
             <p className="font-medium text-ink">No barbers found in {zip}.</p>
-            <p className="mt-1 text-sm text-ink/60">
-              Try another ZIP — in the demo, <span className="font-medium">10001</span> has an active shop.
+            <p className="mt-1 text-sm text-ink/70">
+              Try another ZIP. In the demo, <span className="font-medium">10001</span> has an active shop.
             </p>
           </div>
         ) : (
@@ -142,9 +142,9 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
                     <h3 className="heading-section">{shop.shop_name}</h3>
                     <Badge variant="active">Active</Badge>
                   </div>
-                  {shop.bio && <p className="mt-2 line-clamp-3 text-sm text-ink/60">{shop.bio}</p>}
+                  {shop.bio && <p className="mt-2 line-clamp-3 text-sm text-ink/70">{shop.bio}</p>}
                   {shop.address && (
-                    <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/50">
+                    <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
                       <MapPin className="h-3.5 w-3.5" /> {shop.address}
                     </p>
                   )}
@@ -187,7 +187,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
       <button
         type="button"
         onClick={onBack}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink/60 hover:text-ink"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink/70 hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" /> Back to results
       </button>
@@ -199,7 +199,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
           <h1 className="heading-page mt-3">{shop.shop_name}</h1>
           {shop.bio && <p className="mt-3 text-ink/70">{shop.bio}</p>}
           {shop.address && (
-            <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/60">
+            <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
               <MapPin className="h-4 w-4" /> {shop.address}
               {shop.zip ? `, ${shop.zip}` : ''}
             </p>
@@ -216,7 +216,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
               <Skeleton className="h-11 w-full" />
             </div>
           ) : !slots || slots.length === 0 ? (
-            <p className="text-sm text-ink/60">No open slots right now — check back soon.</p>
+            <p className="text-sm text-ink/70">No open slots right now. Check back soon.</p>
           ) : (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {slots.map((slot) => (
@@ -230,7 +230,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
                   className="rounded-xl border border-ink/15 px-4 py-3 text-left text-sm font-medium text-ink transition-colors duration-150 hover:border-primary hover:bg-badge-active-bg"
                 >
                   {formatDateTime(slot.starts_at)}
-                  <span className="ml-1 font-normal text-ink/50">· {slot.duration_min} min</span>
+                  <span className="ml-1 font-normal text-ink/70">· {slot.duration_min} min</span>
                 </button>
               ))}
             </div>
@@ -280,7 +280,7 @@ function MyBookingsView() {
   return (
     <div>
       <h1 className="heading-page">My bookings</h1>
-      <p className="mt-1 text-ink/60">Your appointments, newest first.</p>
+      <p className="mt-1 text-ink/70">Your appointments, newest first.</p>
 
       <div className="mt-6">
         {isLoading ? (
@@ -291,7 +291,7 @@ function MyBookingsView() {
         ) : !bookings || bookings.length === 0 ? (
           <div className="editorial-card max-w-md">
             <p className="font-medium text-ink">No bookings yet.</p>
-            <p className="mt-1 text-sm text-ink/60">Find a barber and book your first slot.</p>
+            <p className="mt-1 text-sm text-ink/70">Find a barber and book your first slot.</p>
           </div>
         ) : (
           <ul className="max-w-2xl space-y-3">
@@ -324,7 +324,7 @@ function BookingRow({ booking: b }: { booking: MyBooking }) {
         </span>
         <div>
           <p className="font-medium text-ink">{b.barbershop?.shop_name ?? 'Barbershop'}</p>
-          <p className="text-sm text-ink/60">
+          <p className="text-sm text-ink/70">
             {b.service}
             {b.slot ? ` · ${formatDateTime(b.slot.starts_at)}` : ''}
           </p>

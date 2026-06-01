@@ -64,7 +64,7 @@ export function TabsTrigger({ value, children }: { value: string; children: Reac
       onClick={() => setValue(value)}
       className={cn(
         'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors duration-150',
-        selected ? 'bg-primary text-white' : 'text-ink/60 hover:text-ink'
+        selected ? 'bg-primary text-white' : 'text-ink/70 hover:text-ink'
       )}
     >
       {children}

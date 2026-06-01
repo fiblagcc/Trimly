@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 
-// Initials avatar — no image fetch, just a tinted monogram. Quiet and on-brand.
+// Initials avatar - no image fetch, just a tinted monogram. Quiet and on-brand.
 export function Avatar({ name, className }: { name?: string | null; className?: string }) {
   const initials = (name ?? '')
     .trim()

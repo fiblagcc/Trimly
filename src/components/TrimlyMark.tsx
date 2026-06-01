@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 import { TRIMLY_PATHS } from './trimly-logo-paths'
 
-// The square monogram — the 'T' glyph from the wordmark, white on the brand teal.
+// The square monogram - the 'T' glyph from the wordmark, white on the brand teal.
 // Used for the favicon, mobile nav, and any tight spot per ART_DIRECTION §6.
 // Path index 1 in the wordmark is the stylized 'T' (razor stem + comb crossbar).
 const T_PATH = TRIMLY_PATHS[1]

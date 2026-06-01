@@ -1,4 +1,4 @@
-// AUTO-GENERATED from docs/logo.svg by scripts/gen-logo.mjs — do not edit by hand.
+// AUTO-GENERATED from docs/logo.svg by scripts/gen-logo.mjs - do not edit by hand.
 // The genuine Trimly wordmark, exported as inline-SVG path data.
 export const TRIMLY_VIEWBOX = '0 0 1024 544'
 

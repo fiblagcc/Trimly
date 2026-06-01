@@ -23,6 +23,9 @@ docs/
 # Vercel
 .vercel
 
+# Local tooling and editor files
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

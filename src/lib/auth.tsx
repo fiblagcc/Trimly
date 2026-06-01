@@ -24,9 +24,13 @@ export const dashboardPath = (role: Role | undefined) =>
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null)
-  const [profile, setProfile] = React.useState<Profile | null>(null)
+  // The profile is keyed by the user id it was loaded for, so readiness can be
+  // derived during render instead of set synchronously inside an effect.
+  const [loaded, setLoaded] = React.useState<{ uid: string | null; profile: Profile | null }>({
+    uid: null,
+    profile: null,
+  })
   const [authReady, setAuthReady] = React.useState(false)
-  const [profileReady, setProfileReady] = React.useState(false)
   const [nonce, setNonce] = React.useState(0)
 
   // Track the auth session. CRITICAL: never await a Supabase query inside this
@@ -51,30 +55,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   // Load the profile whenever the signed-in user changes (or on manual refresh).
-  const uid = session?.user?.id
+  // The effect only sets state in its async callback; readiness is derived below.
+  const uid = session?.user?.id ?? null
   React.useEffect(() => {
-    if (!uid) {
-      setProfile(null)
-      setProfileReady(true)
-      return
-    }
+    if (!uid) return
     let active = true
-    setProfileReady(false)
     supabase
       .from('profiles')
       .select('*')
       .eq('id', uid)
       .maybeSingle()
       .then(({ data }) => {
-        if (!active) return
-        setProfile((data as Profile) ?? null)
-        setProfileReady(true)
+        if (active) setLoaded({ uid, profile: (data as Profile) ?? null })
       })
     return () => {
       active = false
     }
   }, [uid, nonce])
 
+  // Derived: the profile only counts if it was loaded for the current user.
+  const profile = loaded.uid === uid ? loaded.profile : null
+  const profileReady = !uid || loaded.uid === uid
   // Loading until we know the auth state, and (when signed in) until the profile resolves.
   const loading = !authReady || (!!uid && !profileReady)
 
@@ -89,10 +90,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         await supabase.auth.signOut({ scope: 'local' })
       } catch {
-        // Ignore: we clear local state below regardless of the network result.
+        // Ignore: we clear the session below regardless of the network result.
       }
+      // Clearing the session makes the derived profile null on the next render.
       setSession(null)
-      setProfile(null)
     },
   }
 

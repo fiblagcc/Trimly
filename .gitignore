@@ -36,3 +36,10 @@ docs/
 *.njsproj
 *.sln
 *.sw?
+
+# Local tooling and editor files
+.agents/
+
+# Playwright screenshots (binary churn)
+e2e/shots/
+e2e/loop-login.mjs

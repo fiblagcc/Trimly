@@ -8,7 +8,7 @@ interface AuthState {
   session: Session | null
   profile: Profile | null
   loading: boolean
-  refreshProfile: () => Promise<void>
+  refreshProfile: () => void
   signOut: () => Promise<void>
 }
 
@@ -25,45 +25,64 @@ export const dashboardPath = (role: Role | undefined) =>
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null)
   const [profile, setProfile] = React.useState<Profile | null>(null)
-  const [loading, setLoading] = React.useState(true)
+  const [authReady, setAuthReady] = React.useState(false)
+  const [profileReady, setProfileReady] = React.useState(false)
+  const [nonce, setNonce] = React.useState(0)
 
-  const loadProfile = React.useCallback(async (userId: string | undefined) => {
-    if (!userId) {
-      setProfile(null)
-      return
-    }
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle()
-    setProfile((data as Profile) ?? null)
-  }, [])
-
+  // Track the auth session. CRITICAL: never await a Supabase query inside this
+  // callback. supabase-js holds an auth lock while it emits SIGNED_IN, and a query
+  // here re-enters that lock and can hang signInWithPassword (the "Please wait..."
+  // that never resolves). We only set state here; the profile loads in the effect
+  // below, off this callback's stack.
   React.useEffect(() => {
     let active = true
-    supabase.auth.getSession().then(async ({ data }) => {
+    supabase.auth.getSession().then(({ data }) => {
       if (!active) return
       setSession(data.session)
-      await loadProfile(data.session?.user.id)
-      if (active) setLoading(false)
+      setAuthReady(true)
     })
-
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, next) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next)
-      await loadProfile(next?.user.id)
     })
     return () => {
       active = false
       sub.subscription.unsubscribe()
     }
-  }, [loadProfile])
+  }, [])
+
+  // Load the profile whenever the signed-in user changes (or on manual refresh).
+  const uid = session?.user?.id
+  React.useEffect(() => {
+    if (!uid) {
+      setProfile(null)
+      setProfileReady(true)
+      return
+    }
+    let active = true
+    setProfileReady(false)
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', uid)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!active) return
+        setProfile((data as Profile) ?? null)
+        setProfileReady(true)
+      })
+    return () => {
+      active = false
+    }
+  }, [uid, nonce])
+
+  // Loading until we know the auth state, and (when signed in) until the profile resolves.
+  const loading = !authReady || (!!uid && !profileReady)
 
   const value: AuthState = {
     session,
     profile,
     loading,
-    refreshProfile: () => loadProfile(session?.user.id),
+    refreshProfile: () => setNonce((n) => n + 1),
     signOut: async () => {
       // Local scope clears the stored session right away and does not depend on a
       // server round-trip succeeding, so sign-out is reliable even with a stale token.

@@ -65,7 +65,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     refreshProfile: () => loadProfile(session?.user.id),
     signOut: async () => {
-      await supabase.auth.signOut()
+      // Local scope clears the stored session right away and does not depend on a
+      // server round-trip succeeding, so sign-out is reliable even with a stale token.
+      try {
+        await supabase.auth.signOut({ scope: 'local' })
+      } catch {
+        // Ignore: we clear local state below regardless of the network result.
+      }
+      setSession(null)
+      setProfile(null)
     },
   }
 

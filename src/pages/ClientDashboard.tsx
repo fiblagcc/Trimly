@@ -82,10 +82,10 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
 
   return (
     <div>
-      {/* Search hero - big type, asymmetric (left-aligned, not centered). */}
+      {/* Search hero. Page-scale type here; the 72px hero is reserved for the landing. */}
       <div className="max-w-2xl">
-        <h1 className="heading-hero">Find a barber near you.</h1>
-        <p className="mt-4 text-lg text-ink/70">
+        <h1 className="heading-page">Find a barber near you.</h1>
+        <p className="mt-3 text-lg text-ink/70">
           Enter your ZIP code to see barbers taking bookings in your area.
         </p>
         <form onSubmit={onSearch} className="mt-6 flex max-w-md gap-3">
@@ -331,7 +331,7 @@ function BookingRow({ booking: b }: { booking: MyBooking }) {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <Badge variant={statusVariant}>{b.status}</Badge>
+        <Badge variant={statusVariant} className="capitalize">{b.status}</Badge>
         {canNavigate && (
           <a
             href={directionsUrl(b.barbershop!.latitude!, b.barbershop!.longitude!)}

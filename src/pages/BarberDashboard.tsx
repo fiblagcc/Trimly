@@ -52,7 +52,7 @@ export function BarberDashboard() {
       {/* Dark anchor sidebar - the single dark surface for this layout. */}
       <aside className="lg:w-64 lg:shrink-0">
         <div className="rounded-card-lg bg-dark-anchor p-6 text-white lg:sticky lg:top-24">
-          <p className="label-section !text-white/50">Signed in as</p>
+          <p className="label-section !text-white/60">Signed in as</p>
           <p className="mt-1 truncate font-display text-xl text-white">
             {shop?.shop_name || profile?.full_name || 'Your shop'}
           </p>
@@ -409,7 +409,9 @@ function BookingsSection({ shop }: { shop: Barbershop | null }) {
                     {b.slot ? ` · ${formatDateTime(b.slot.starts_at)}` : ''}
                   </p>
                 </div>
-                <Badge variant={b.status === 'cancelled' ? 'inactive' : 'active'}>{b.status}</Badge>
+                <Badge variant={b.status === 'cancelled' ? 'inactive' : 'active'} className="capitalize">
+                  {b.status}
+                </Badge>
               </li>
             ))}
           </ul>

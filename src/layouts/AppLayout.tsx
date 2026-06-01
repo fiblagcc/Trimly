@@ -9,8 +9,12 @@ export function AppLayout() {
   const { profile, signOut } = useAuth()
 
   const handleSignOut = async () => {
-    await signOut()
-    navigate('/login', { replace: true })
+    // Navigate no matter what so a failed network revoke can never strand the user.
+    try {
+      await signOut()
+    } finally {
+      navigate('/login', { replace: true })
+    }
   }
 
   return (

@@ -23,6 +23,9 @@ docs/
 # Vercel
 .vercel
 
+# Local AI-harness tooling (impeccable design skill, etc.) — workflow aid, not app code
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

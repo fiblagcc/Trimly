@@ -97,8 +97,8 @@ const { data: incoming } = await barber
 const seen = (incoming ?? []).find((b) => b.id === appt?.id)
 ok('barber sees the new booking with client name', !!seen && seen.client?.full_name === 'Casey Client', seen?.client?.full_name)
 
-// 8. realtime fired
-await new Promise((r) => setTimeout(r, 4000))
+// 8. realtime fired (Supabase WAL can lag a few seconds; poll up to ~10s)
+for (let i = 0; i < 20 && !realtimeFired; i++) await new Promise((r) => setTimeout(r, 500))
 ok('barber received the booking live (realtime INSERT)', realtimeFired)
 await barber.removeChannel(channel)
 

@@ -137,6 +137,52 @@ as $$
   );
 $$;
 
+-- book_slot(): atomically book an open slot. Locks the slot row (FOR UPDATE) so two
+-- clients racing for the same slot can't both win — the second sees it already booked.
+-- SECURITY DEFINER so it can flip the slot's is_booked (clients don't own slots), but
+-- it always books for the CALLER (client_id = auth.uid()) and only on an active shop.
+create or replace function public.book_slot(p_slot_id uuid, p_service text)
+returns public.appointments
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid  uuid := auth.uid();
+  v_slot public.availability_slots;
+  v_shop public.barbershops;
+  v_appt public.appointments;
+begin
+  if v_uid is null then
+    raise exception 'not authenticated';
+  end if;
+
+  select * into v_slot from public.availability_slots where id = p_slot_id for update;
+  if not found then
+    raise exception 'slot not found';
+  end if;
+  if v_slot.is_booked then
+    raise exception 'slot already booked' using errcode = 'P0001';
+  end if;
+  if v_slot.starts_at <= now() then
+    raise exception 'slot is in the past';
+  end if;
+
+  select * into v_shop from public.barbershops where id = v_slot.barbershop_id;
+  if not found or not v_shop.is_active then
+    raise exception 'shop not available';
+  end if;
+
+  insert into public.appointments (slot_id, client_id, barbershop_id, service)
+  values (p_slot_id, v_uid, v_slot.barbershop_id, coalesce(nullif(p_service, ''), 'Haircut'))
+  returning * into v_appt;
+
+  update public.availability_slots set is_booked = true where id = p_slot_id;
+
+  return v_appt;
+end;
+$$;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Row Level Security (SPEC §5). RLS ON for EVERY table. Never world-readable.
 -- ─────────────────────────────────────────────────────────────────────────────

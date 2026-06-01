@@ -88,24 +88,31 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
         <p className="mt-3 text-lg text-ink/70">
           Enter your ZIP code to see barbers taking bookings in your area.
         </p>
-        <form onSubmit={onSearch} className="mt-6 flex max-w-md gap-3">
+        <form onSubmit={onSearch} className="mt-6 flex max-w-xl gap-3">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/55" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink/55" />
             <Input
               aria-label="ZIP code"
-              placeholder="e.g. 10001"
+              placeholder="Enter your ZIP code"
               value={zipInput}
               onChange={(e) => setZipInput(e.target.value)}
               inputMode="numeric"
-              className="pl-10"
+              className="h-14 pl-12 text-base"
             />
           </div>
-          <Button type="submit">Search</Button>
+          <Button type="submit" size="lg" className="h-14 px-7">
+            Search
+          </Button>
         </form>
+        <p className="mt-3 text-sm text-ink/70">
+          Trying the demo? Search <span className="font-semibold text-primary-dark">10001</span>.
+        </p>
       </div>
 
       <div className="mt-12">
-        {zip === null ? null : isFetching ? (
+        {zip === null ? (
+          <PreSearchGuide />
+        ) : isFetching ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Skeleton className="h-40 w-full" />
             <Skeleton className="h-40 w-full" />
@@ -153,6 +160,31 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
             </div>
           </>
         )}
+      </div>
+    </div>
+  )
+}
+
+// Quiet onboarding shown before the first search, so the page teaches instead of
+// sitting empty. No fake data, just the three honest steps.
+const GUIDE = [
+  { n: '01', title: 'Search your ZIP', body: 'See the barbers near you taking bookings right now.' },
+  { n: '02', title: 'Pick a time', body: 'Choose an open slot and the service you want.' },
+  { n: '03', title: 'Show up sharp', body: 'Get directions on the day and skip the wait.' },
+]
+
+function PreSearchGuide() {
+  return (
+    <div className="border-t border-ink/8 pt-10">
+      <p className="label-section">How booking works</p>
+      <div className="mt-6 grid gap-x-10 gap-y-8 sm:grid-cols-3">
+        {GUIDE.map((s) => (
+          <div key={s.n}>
+            <div className="font-display text-4xl font-semibold text-primary/30">{s.n}</div>
+            <h3 className="mt-2 font-medium text-ink">{s.title}</h3>
+            <p className="mt-1 text-sm text-ink/70">{s.body}</p>
+          </div>
+        ))}
       </div>
     </div>
   )

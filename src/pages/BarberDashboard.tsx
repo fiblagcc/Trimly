@@ -99,14 +99,14 @@ export function BarberDashboard() {
             <Skeleton className="h-64 w-full" />
           </div>
         ) : (
-          <>
+          <div key={section} className="motion-safe:animate-[fadeIn_200ms_ease]">
             {section === 'profile' && (
               <ProfileSection ownerId={ownerId} shop={shop ?? null} onSaved={() => setSection('subscription')} />
             )}
             {section === 'subscription' && <SubscriptionSection ownerId={ownerId} shop={shop ?? null} />}
             {section === 'availability' && <AvailabilitySection shop={shop ?? null} />}
             {section === 'bookings' && <BookingsSection shop={shop ?? null} />}
-          </>
+          </div>
         )}
       </div>
     </div>
@@ -178,29 +178,31 @@ function ProfileSection({
           />
         </Field>
 
-        <Field label="Address" htmlFor="address">
-          <Input id="address" value={form.address ?? ''} onChange={(e) => set('address', e.target.value)} />
-        </Field>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Latitude" htmlFor="lat" hint="For the client's “Get directions” link.">
-            <Input
-              id="lat"
-              type="number"
-              step="any"
-              value={form.latitude ?? ''}
-              onChange={(e) => set('latitude', e.target.value === '' ? null : Number(e.target.value))}
-            />
+        <div className="space-y-5 border-t border-ink/8 pt-5">
+          <p className="label-section">Location</p>
+          <Field label="Address" htmlFor="address">
+            <Input id="address" value={form.address ?? ''} onChange={(e) => set('address', e.target.value)} />
           </Field>
-          <Field label="Longitude" htmlFor="lng">
-            <Input
-              id="lng"
-              type="number"
-              step="any"
-              value={form.longitude ?? ''}
-              onChange={(e) => set('longitude', e.target.value === '' ? null : Number(e.target.value))}
-            />
-          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Latitude" htmlFor="lat" hint="Used for the client's Get directions link.">
+              <Input
+                id="lat"
+                type="number"
+                step="any"
+                value={form.latitude ?? ''}
+                onChange={(e) => set('latitude', e.target.value === '' ? null : Number(e.target.value))}
+              />
+            </Field>
+            <Field label="Longitude" htmlFor="lng">
+              <Input
+                id="lng"
+                type="number"
+                step="any"
+                value={form.longitude ?? ''}
+                onChange={(e) => set('longitude', e.target.value === '' ? null : Number(e.target.value))}
+              />
+            </Field>
+          </div>
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

@@ -34,7 +34,10 @@ async function sql(query) {
   return t ? JSON.parse(t) : null
 }
 
-// Fixed UUIDs so the script is idempotent.
+// Fixed UUIDs so the script is idempotent. A and B are PURE CLIENTS; a SEPARATE
+// barber owns the shop — otherwise A (as owner) would legitimately see B's booking
+// and the test would prove nothing.
+const OWNER = '00000000-0000-4000-a000-0000000000c1' // barber who owns the shop
 const A = '00000000-0000-4000-a000-000000000a01' // client A
 const B = '00000000-0000-4000-a000-000000000b02' // client B
 const SHOP = '00000000-0000-4000-a000-0000000005ff'
@@ -44,33 +47,42 @@ const APPT_A = '00000000-0000-4000-a000-0000000091a1'
 const APPT_B = '00000000-0000-4000-a000-0000000091b2'
 const PW = 'rlscheck123'
 
-console.log('› planting two clients + an appointment each (via Management API)…')
+// GoTrue rejects auth.users rows with NULL token columns ("Database error querying
+// schema"), so set the no-default ones to ''.
+const TOKENS = `'', '', '', ''`
+const TOKEN_COLS = 'confirmation_token, recovery_token, email_change_token_new, email_change'
+
+console.log('› planting a barber-owned shop + two clients with a booking each…')
 await sql(`
-  -- two confirmed client auth users with known passwords
   insert into auth.users (instance_id, id, aud, role, email, encrypted_password,
-    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+    email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    ${TOKEN_COLS})
   values
+    ('00000000-0000-0000-0000-000000000000', '${OWNER}', 'authenticated', 'authenticated',
+     'rls_owner@trimly.test', crypt('${PW}', gen_salt('bf')), now(),
+     '{"provider":"email","providers":["email"]}', '{"role":"barber"}', now(), now(), ${TOKENS}),
     ('00000000-0000-0000-0000-000000000000', '${A}', 'authenticated', 'authenticated',
      'rls_a@trimly.test', crypt('${PW}', gen_salt('bf')), now(),
-     '{"provider":"email","providers":["email"]}', '{"role":"client"}', now(), now()),
+     '{"provider":"email","providers":["email"]}', '{"role":"client"}', now(), now(), ${TOKENS}),
     ('00000000-0000-0000-0000-000000000000', '${B}', 'authenticated', 'authenticated',
      'rls_b@trimly.test', crypt('${PW}', gen_salt('bf')), now(),
-     '{"provider":"email","providers":["email"]}', '{"role":"client"}', now(), now())
+     '{"provider":"email","providers":["email"]}', '{"role":"client"}', now(), now(), ${TOKENS})
   on conflict (id) do nothing;
 
   insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
   values
+    ('${OWNER}', '${OWNER}', '{"sub":"${OWNER}","email":"rls_owner@trimly.test"}', 'email', now(), now(), now()),
     ('${A}', '${A}', '{"sub":"${A}","email":"rls_a@trimly.test"}', 'email', now(), now(), now()),
     ('${B}', '${B}', '{"sub":"${B}","email":"rls_b@trimly.test"}', 'email', now(), now(), now())
   on conflict (provider, provider_id) do nothing;
 
   -- profiles are created by the signup trigger; ensure present in case it was off
   insert into public.profiles (id, role, full_name) values
-    ('${A}', 'client', 'RLS Client A'), ('${B}', 'client', 'RLS Client B')
+    ('${OWNER}', 'barber', 'RLS Barber'), ('${A}', 'client', 'RLS Client A'), ('${B}', 'client', 'RLS Client B')
   on conflict (id) do nothing;
 
   insert into public.barbershops (id, owner_id, shop_name, zip, is_active, subscription_status)
-  values ('${SHOP}', '${A}', 'RLS Test Shop', '00000', true, 'active')
+  values ('${SHOP}', '${OWNER}', 'RLS Test Shop', '00000', true, 'active')
   on conflict (id) do nothing;
 
   insert into public.availability_slots (id, barbershop_id, starts_at, is_booked) values
@@ -128,9 +140,9 @@ await sql(`
   delete from public.appointments where id in ('${APPT_A}', '${APPT_B}');
   delete from public.availability_slots where id in ('${SLOT_A}', '${SLOT_B}');
   delete from public.barbershops where id = '${SHOP}';
-  delete from public.profiles where id in ('${A}', '${B}');
-  delete from auth.identities where user_id in ('${A}', '${B}');
-  delete from auth.users where id in ('${A}', '${B}');
+  delete from public.profiles where id in ('${OWNER}', '${A}', '${B}');
+  delete from auth.identities where user_id in ('${OWNER}', '${A}', '${B}');
+  delete from auth.users where id in ('${OWNER}', '${A}', '${B}');
 `)
 console.log('› cleaned up test rows')
 process.exit(pass ? 0 : 1)

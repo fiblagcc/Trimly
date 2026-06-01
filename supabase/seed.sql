@@ -17,26 +17,29 @@
 --   barber3 55555555-5555-4555-8555-555555555555  (owns an inactive shop)
 
 -- ── Demo auth users (email confirmed so they can sign in immediately) ─────────
+-- The four token columns are set to '' on purpose: they have no default, and GoTrue
+-- refuses to authenticate a user row where they are NULL ("Database error querying schema").
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
-  raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change
 )
 values
   ('00000000-0000-0000-0000-000000000000', '11111111-1111-4111-8111-111111111111',
    'authenticated', 'authenticated', 'client@trimly.demo', crypt('trimly123', gen_salt('bf')), now(),
-   '{"provider":"email","providers":["email"]}', '{"role":"client","full_name":"Casey Client"}', now(), now()),
+   '{"provider":"email","providers":["email"]}', '{"role":"client","full_name":"Casey Client"}', now(), now(), '', '', '', ''),
   ('00000000-0000-0000-0000-000000000000', '22222222-2222-4222-8222-222222222222',
    'authenticated', 'authenticated', 'barber@trimly.demo', crypt('trimly123', gen_salt('bf')), now(),
-   '{"provider":"email","providers":["email"]}', '{"role":"barber","full_name":"Marcus Fade"}', now(), now()),
+   '{"provider":"email","providers":["email"]}', '{"role":"barber","full_name":"Marcus Fade"}', now(), now(), '', '', '', ''),
   ('00000000-0000-0000-0000-000000000000', '33333333-3333-4333-8333-333333333333',
    'authenticated', 'authenticated', 'admin@trimly.demo', crypt('trimly123', gen_salt('bf')), now(),
-   '{"provider":"email","providers":["email"]}', '{"role":"admin","full_name":"Avery Admin"}', now(), now()),
+   '{"provider":"email","providers":["email"]}', '{"role":"admin","full_name":"Avery Admin"}', now(), now(), '', '', '', ''),
   ('00000000-0000-0000-0000-000000000000', '44444444-4444-4444-8444-444444444444',
    'authenticated', 'authenticated', 'barber2@trimly.demo', crypt('trimly123', gen_salt('bf')), now(),
-   '{"provider":"email","providers":["email"]}', '{"role":"barber","full_name":"Dana Clipper"}', now(), now()),
+   '{"provider":"email","providers":["email"]}', '{"role":"barber","full_name":"Dana Clipper"}', now(), now(), '', '', '', ''),
   ('00000000-0000-0000-0000-000000000000', '55555555-5555-4555-8555-555555555555',
    'authenticated', 'authenticated', 'barber3@trimly.demo', crypt('trimly123', gen_salt('bf')), now(),
-   '{"provider":"email","providers":["email"]}', '{"role":"barber","full_name":"Sam Shears"}', now(), now())
+   '{"provider":"email","providers":["email"]}', '{"role":"barber","full_name":"Sam Shears"}', now(), now(), '', '', '', '')
 on conflict (id) do nothing;
 
 -- Email identities (required for password sign-in).

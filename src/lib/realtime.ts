@@ -14,6 +14,11 @@ export function useBookingRealtime(shopId: string | undefined) {
   React.useEffect(() => {
     if (!shopId) return
 
+    // Ensure the realtime socket carries the user's JWT so RLS-gated changes flow.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) supabase.realtime.setAuth(data.session.access_token)
+    })
+
     const channel = supabase
       .channel(`appointments:${shopId}`)
       .on(

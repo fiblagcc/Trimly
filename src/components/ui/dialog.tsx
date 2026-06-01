@@ -54,7 +54,7 @@ export function Dialog({
           type="button"
           onClick={() => onOpenChange(false)}
           aria-label="Close"
-          className="absolute right-4 top-4 rounded-lg p-1 text-ink/40 transition-colors hover:bg-sand hover:text-ink"
+          className="absolute right-4 top-4 rounded-lg p-1 text-ink/55 transition-colors hover:bg-sand hover:text-ink"
         >
           <X className="h-4 w-4" />
         </button>
@@ -73,7 +73,7 @@ export function DialogTitle({ children }: { children: React.ReactNode }) {
 }
 
 export function DialogDescription({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-ink/60">{children}</p>
+  return <p className="text-sm text-ink/70">{children}</p>
 }
 
 export function DialogFooter({ children }: { children: React.ReactNode }) {

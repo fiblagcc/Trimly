@@ -1,8 +1,8 @@
 import type { FC } from 'react'
 import { TRIMLY_PATHS, TRIMLY_VIEWBOX } from './trimly-logo-paths'
 
-// Fixed sizes per ART_DIRECTION §6 — the logo is never free-resized.
-const HEIGHTS = { nav: 28, auth: 36, footer: 24 } as const
+// Fixed sizes per ART_DIRECTION §6 - the logo is never free-resized.
+const HEIGHTS = { nav: 38, auth: 50, footer: 32 } as const
 const [, , VB_W, VB_H] = TRIMLY_VIEWBOX.split(' ').map(Number)
 const ASPECT = VB_W / VB_H
 
@@ -16,7 +16,7 @@ interface TrimlyLogoProps {
 /**
  * The genuine Trimly wordmark, rendered as inline SVG (crisp at every size,
  * recolorable, no PNG fuzz). Paths are exported verbatim from docs/logo.svg by
- * scripts/gen-logo.mjs — this component never redraws the mark. The original
+ * scripts/gen-logo.mjs - this component never redraws the mark. The original
  * black fills are swapped to `currentColor` so the color comes from the theme
  * token, letting it flip to white on the dark surface.
  */

@@ -3,7 +3,7 @@ import { useAuth, dashboardPath } from '@/lib/auth'
 import type { Role } from '@/lib/types'
 import { TrimlyMark } from '@/components/TrimlyMark'
 
-// Route guard keyed on profiles.role (NOT on hiding links — SPEC §7):
+// Route guard keyed on profiles.role (NOT on hiding links - SPEC §7):
 //   • logged out                  → /login
 //   • logged in, wrong role       → redirected to their own dashboard
 //   • profile row not ready yet   → brief loading state
@@ -28,7 +28,7 @@ export function RoleRoute({ allow, children }: { allow: Role; children: React.Re
     return <Navigate to={dashboardPath(profile.role)} replace />
   }
 
-  // Session but no profile yet (rare trigger lag) — send to login to re-resolve.
+  // Session but no profile yet (rare trigger lag) - send to login to re-resolve.
   if (!profile) {
     return <Navigate to="/login" replace />
   }

@@ -3,7 +3,7 @@
 //
 // Setup is done with the Management API (runs as superuser, bypasses RLS) so we can
 // plant two clients + their appointments deterministically. The actual ASSERTIONS
-// run through the anon JS client logged in as client A — i.e. exactly the path the
+// run through the anon JS client logged in as client A - i.e. exactly the path the
 // browser uses, with RLS fully enforced.
 //
 // Usage:  SUPABASE_ACCESS_TOKEN=sbp_... node scripts/rls-check.mjs
@@ -35,7 +35,7 @@ async function sql(query) {
 }
 
 // Fixed UUIDs so the script is idempotent. A and B are PURE CLIENTS; a SEPARATE
-// barber owns the shop — otherwise A (as owner) would legitimately see B's booking
+// barber owns the shop - otherwise A (as owner) would legitimately see B's booking
 // and the test would prove nothing.
 const OWNER = '00000000-0000-4000-a000-0000000000c1' // barber who owns the shop
 const A = '00000000-0000-4000-a000-000000000a01' // client A
@@ -103,7 +103,7 @@ console.log('› signed in as client A through the anon client (RLS enforced)\n'
 
 let pass = true
 const check = (name, ok, detail) => {
-  console.log(`${ok ? 'PASS' : 'FAIL'} — ${name}${detail ? `  (${detail})` : ''}`)
+  console.log(`${ok ? 'PASS' : 'FAIL'} - ${name}${detail ? `  (${detail})` : ''}`)
   if (!ok) pass = false
 }
 
@@ -133,7 +133,7 @@ const check = (name, ok, detail) => {
 }
 
 await a.auth.signOut()
-console.log(`\n${pass ? '✅ RLS CHECK PASSED' : '❌ RLS CHECK FAILED — fix the policy, do not disable RLS'}`)
+console.log(`\n${pass ? '✅ RLS CHECK PASSED' : '❌ RLS CHECK FAILED - fix the policy, do not disable RLS'}`)
 
 // Clean up the test rows so they don't pollute the demo.
 await sql(`

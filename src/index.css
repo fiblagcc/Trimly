@@ -9,6 +9,7 @@
   --color-accent: #FAC775;
   --color-sand: #F1EFE8;
   --color-ink: #1A1A1A;
+  --color-ink-muted: #5B5A55;
   --color-dark-anchor: #0A2620;
 
   /* Badge palettes */
@@ -73,10 +74,10 @@ body {
 .label-section {
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+  color: var(--color-ink-muted); /* AA-safe on white and sand (~6:1) */
 }
 
 /* ─── The Signature Editorial Card ─────────────────────────── */

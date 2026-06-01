@@ -32,7 +32,7 @@ const NAV: { id: Section; label: string; icon: React.ElementType }[] = [
   { id: 'bookings', label: 'Incoming bookings', icon: Inbox },
 ]
 
-// Lower bound for the "add slot" picker — computed once at load (local time, trimmed
+// Lower bound for the "add slot" picker - computed once at load (local time, trimmed
 // to minutes). Good enough to stop barbers picking a time in the past.
 const MIN_DATETIME_LOCAL = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
   .toISOString()
@@ -49,7 +49,7 @@ export function BarberDashboard() {
 
   return (
     <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-10 lg:flex-row lg:gap-12">
-      {/* Dark anchor sidebar — the single dark surface for this layout. */}
+      {/* Dark anchor sidebar - the single dark surface for this layout. */}
       <aside className="lg:w-64 lg:shrink-0">
         <div className="rounded-card-lg bg-dark-anchor p-6 text-white lg:sticky lg:top-24">
           <p className="label-section !text-white/50">Signed in as</p>
@@ -146,7 +146,7 @@ function ProfileSection({
     }
     try {
       await save.mutateAsync({ existing: shop, values: form })
-      toast.success(shop ? 'Shop updated.' : 'Shop created — activate your subscription to go live.')
+      toast.success(shop ? 'Shop updated.' : 'Shop created. Activate your subscription to go live.')
       if (!shop) onSaved()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save.')
@@ -156,7 +156,7 @@ function ProfileSection({
   return (
     <section>
       <h1 className="heading-page">{shop ? 'Shop profile' : 'Set up your shop'}</h1>
-      <p className="mt-1 text-ink/60">The details clients see when they find you.</p>
+      <p className="mt-1 text-ink/70">The details clients see when they find you.</p>
 
       <form onSubmit={onSubmit} className="editorial-card mt-6 space-y-5">
         <div className="grid gap-5 sm:grid-cols-2">
@@ -174,7 +174,7 @@ function ProfileSection({
             value={form.bio ?? ''}
             onChange={(e) => set('bio', e.target.value)}
             rows={3}
-            className="flex w-full rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/40 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+            className="flex w-full rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/55 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
           />
         </Field>
 
@@ -224,7 +224,7 @@ function SubscriptionSection({ ownerId, shop }: { ownerId: string | undefined; s
       <section>
         <h1 className="heading-page">Subscription</h1>
         <div className="editorial-card mt-6">
-          <p className="text-ink/60">Create your shop profile first, then activate your subscription here.</p>
+          <p className="text-ink/70">Create your shop profile first, then activate your subscription here.</p>
         </div>
       </section>
     )
@@ -234,7 +234,7 @@ function SubscriptionSection({ ownerId, shop }: { ownerId: string | undefined; s
   const flip = async () => {
     try {
       await toggle.mutateAsync({ shopId: shop.id, active: !active })
-      toast.success(active ? 'Subscription paused — your shop is hidden from search.' : 'You’re live! Clients can find and book you.')
+      toast.success(active ? 'Subscription paused. Your shop is hidden from search.' : 'You’re live. Clients can find and book you.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not update subscription.')
     }
@@ -243,7 +243,7 @@ function SubscriptionSection({ ownerId, shop }: { ownerId: string | undefined; s
   return (
     <section>
       <h1 className="heading-page">Subscription</h1>
-      <p className="mt-1 text-ink/60">This is the gate that makes your shop visible to clients.</p>
+      <p className="mt-1 text-ink/70">This is the gate that makes your shop visible to clients.</p>
 
       <div className="editorial-card mt-6">
         <div className="flex items-center justify-between gap-4">
@@ -251,7 +251,7 @@ function SubscriptionSection({ ownerId, shop }: { ownerId: string | undefined; s
             <p className="label-section">Current status</p>
             <div className="mt-2">
               <Badge variant={active ? 'active' : 'inactive'}>
-                {active ? 'Active — visible in search' : 'Inactive — hidden from search'}
+                {active ? 'Active, visible in search' : 'Inactive, hidden from search'}
               </Badge>
             </div>
           </div>
@@ -260,8 +260,8 @@ function SubscriptionSection({ ownerId, shop }: { ownerId: string | undefined; s
           </Button>
         </div>
 
-        <p className="mt-5 border-t border-ink/8 pt-4 text-sm text-ink/50">
-          Trimly only charges barbers. There’s no real billing in this demo — activating
+        <p className="mt-5 border-t border-ink/8 pt-4 text-sm text-ink/70">
+          Trimly only charges barbers. There’s no real billing in this demo, so activating
           flips the visibility flag directly. In production this is where Stripe Checkout
           would confirm payment before the shop goes live.
         </p>
@@ -283,7 +283,7 @@ function AvailabilitySection({ shop }: { shop: Barbershop | null }) {
       <section>
         <h1 className="heading-page">Availability</h1>
         <div className="editorial-card mt-6">
-          <p className="text-ink/60">Create your shop profile first to open up bookable times.</p>
+          <p className="text-ink/70">Create your shop profile first to open up bookable times.</p>
         </div>
       </section>
     )
@@ -304,7 +304,7 @@ function AvailabilitySection({ shop }: { shop: Barbershop | null }) {
   return (
     <section>
       <h1 className="heading-page">Availability</h1>
-      <p className="mt-1 text-ink/60">Open up the times clients can book.</p>
+      <p className="mt-1 text-ink/70">Open up the times clients can book.</p>
 
       <form onSubmit={onAdd} className="editorial-card mt-6 flex flex-wrap items-end gap-4">
         <Field label="Date & time" htmlFor="startsAt" className="flex-1 min-w-[200px]">
@@ -337,7 +337,7 @@ function AvailabilitySection({ shop }: { shop: Barbershop | null }) {
             <Skeleton className="h-14 w-full" />
           </div>
         ) : !slots || slots.length === 0 ? (
-          <div className="editorial-card text-ink/60">No upcoming slots yet. Add one above.</div>
+          <div className="editorial-card text-ink/70">No upcoming slots yet. Add one above.</div>
         ) : (
           <ul className="space-y-2">
             {slots.map((slot) => (
@@ -347,7 +347,7 @@ function AvailabilitySection({ shop }: { shop: Barbershop | null }) {
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium text-ink">{formatDateTime(slot.starts_at)}</span>
-                  <span className="text-sm text-ink/50">{slot.duration_min} min</span>
+                  <span className="text-sm text-ink/70">{slot.duration_min} min</span>
                   {slot.is_booked && <Badge variant="active">Booked</Badge>}
                 </div>
                 {!slot.is_booked && (
@@ -378,7 +378,7 @@ function BookingsSection({ shop }: { shop: Barbershop | null }) {
       <section>
         <h1 className="heading-page">Incoming bookings</h1>
         <div className="editorial-card mt-6">
-          <p className="text-ink/60">Bookings will show here once your shop is set up and live.</p>
+          <p className="text-ink/70">Bookings will show here once your shop is set up and live.</p>
         </div>
       </section>
     )
@@ -387,7 +387,7 @@ function BookingsSection({ shop }: { shop: Barbershop | null }) {
   return (
     <section>
       <h1 className="heading-page">Incoming bookings</h1>
-      <p className="mt-1 text-ink/60">Newest first. New bookings arrive live.</p>
+      <p className="mt-1 text-ink/70">Newest first. New bookings arrive live.</p>
 
       <div className="mt-6">
         {isLoading ? (
@@ -396,7 +396,7 @@ function BookingsSection({ shop }: { shop: Barbershop | null }) {
             <Skeleton className="h-20 w-full" />
           </div>
         ) : !bookings || bookings.length === 0 ? (
-          <div className="editorial-card text-ink/60">No bookings yet.</div>
+          <div className="editorial-card text-ink/70">No bookings yet.</div>
         ) : (
           <ul className="space-y-3">
             {bookings.map((b) => (
@@ -404,7 +404,7 @@ function BookingsSection({ shop }: { shop: Barbershop | null }) {
                 <Avatar name={b.client?.full_name} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-ink">{b.client?.full_name ?? 'Client'}</p>
-                  <p className="text-sm text-ink/60">
+                  <p className="text-sm text-ink/70">
                     {b.service}
                     {b.slot ? ` · ${formatDateTime(b.slot.starts_at)}` : ''}
                   </p>
@@ -442,7 +442,7 @@ function Field({
         {required && <span className="text-primary"> *</span>}
       </Label>
       {children}
-      {hint && <p className="text-xs text-ink/50">{hint}</p>}
+      {hint && <p className="text-xs text-ink/70">{hint}</p>}
     </div>
   )
 }

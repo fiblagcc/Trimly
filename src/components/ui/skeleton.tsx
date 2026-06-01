@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 
-// Loading placeholder — card-shaped, not a spinner (ART_DIRECTION §7).
+// Loading placeholder - card-shaped, not a spinner (ART_DIRECTION §7).
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div

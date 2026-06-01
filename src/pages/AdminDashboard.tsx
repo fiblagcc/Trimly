@@ -33,7 +33,7 @@ export function AdminDashboard() {
     <div className="mx-auto max-w-[1200px] space-y-12 px-6 py-10">
       <div>
         <h1 className="heading-page">Admin</h1>
-        <p className="mt-1 text-ink/60">Support tickets and a snapshot of the platform.</p>
+        <p className="mt-1 text-ink/70">Support tickets and a snapshot of the platform.</p>
       </div>
 
       <ReportSection />
@@ -72,7 +72,7 @@ function ReportSection() {
       </div>
 
       {!generated ? (
-        <div className="editorial-card mt-4 text-ink/60">
+        <div className="editorial-card mt-4 text-ink/70">
           Generate a report to see current platform counts.
         </div>
       ) : (
@@ -119,7 +119,7 @@ function TicketsSection() {
             <Skeleton className="h-10 w-full" />
           </div>
         ) : !tickets || tickets.length === 0 ? (
-          <p className="text-ink/60">No tickets yet.</p>
+          <p className="text-ink/70">No tickets yet.</p>
         ) : (
           <Table>
             <TableHeader>
@@ -135,8 +135,8 @@ function TicketsSection() {
               {tickets.map((t) => (
                 <TableRow key={t.id}>
                   <TableCell className="font-medium text-ink">{t.subject}</TableCell>
-                  <TableCell>{t.opener?.full_name ?? '—'}</TableCell>
-                  <TableCell className="text-ink/60">{formatDate(t.created_at)}</TableCell>
+                  <TableCell>{t.opener?.full_name ?? 'Unknown'}</TableCell>
+                  <TableCell className="text-ink/70">{formatDate(t.created_at)}</TableCell>
                   <TableCell>
                     <Badge variant={STATUS_VARIANT[t.status]}>{STATUS_LABEL[t.status]}</Badge>
                   </TableCell>

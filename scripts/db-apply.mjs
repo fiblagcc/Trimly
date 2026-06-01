@@ -1,7 +1,7 @@
 // Applies a .sql file to the live Supabase project via the Management API.
 // Usage:  SUPABASE_ACCESS_TOKEN=sbp_... node scripts/db-apply.mjs supabase/migrations/0001_init.sql
 // The token is a Supabase Personal Access Token (Account → Access Tokens). It is read
-// from the environment only — never hard-code or commit it.
+// from the environment only - never hard-code or commit it.
 import { readFileSync, existsSync } from 'node:fs'
 
 const PROJECT_REF = 'madsedhycdiattoaypyl'
@@ -37,7 +37,7 @@ const res = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/dat
 
 const text = await res.text()
 if (!res.ok) {
-  console.error(`✗ ${file} failed — HTTP ${res.status}`)
+  console.error(`✗ ${file} failed - HTTP ${res.status}`)
   console.error(text)
   process.exit(1)
 }

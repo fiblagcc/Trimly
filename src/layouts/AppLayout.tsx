@@ -22,7 +22,7 @@ export function AppLayout() {
           </Link>
           <div className="flex items-center gap-4">
             {profile?.full_name && (
-              <span className="hidden text-sm text-ink/60 sm:inline">
+              <span className="hidden text-sm text-ink/70 sm:inline">
                 {profile.full_name}
               </span>
             )}

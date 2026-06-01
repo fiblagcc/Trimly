@@ -55,7 +55,7 @@ export function useSaveShop(ownerId: string | undefined) {
 // ── Subscription toggle: flips is_active AND subscription_status together ─────
 // NOTE: there is no real billing here. This is the single gate that makes a shop
 // visible to clients. A real build would hand off to Stripe Checkout/Billing
-// before flipping these flags — that integration would hook in right here.
+// before flipping these flags - that integration would hook in right here.
 export function useToggleSubscription(ownerId: string | undefined) {
   const qc = useQueryClient()
   return useMutation({

@@ -15,7 +15,7 @@ Three kinds of users:
 
 ## Live demo
 
-The app is deployed at **https://trimly-pearl-seven.vercel.app**. Sign in with the client
+The app is deployed at **https://beta-trimly.vercel.app**. Sign in with the client
 account below and search ZIP `10001` to see the full booking flow.
 
 ## Stack

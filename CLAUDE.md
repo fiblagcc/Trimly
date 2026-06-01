@@ -123,7 +123,7 @@ token columns (`confirmation_token`, `recovery_token`, `email_change_token_new`,
 `email_change`) to `''`, or GoTrue rejects sign-in with "Database error querying schema".
 
 **Shipped:** pushed to GitHub at https://github.com/fiblagcc/Trimly (public, `main`), and
-deployed to Vercel - live at **https://trimly-pearl-seven.vercel.app** (Vercel project
+deployed to Vercel - live at **https://beta-trimly.vercel.app** (Vercel project
 `fakhrul-bhuiyan-s-projects/trimly`, both `VITE_` env vars set on Production, SPA routing
 via `vercel.json`, Supabase URL confirmed baked into the bundle). Re-deploy with
 `vercel deploy --prod`; GitHub pushes use the `gh` credential helper (logged in as `fiblagcc`).

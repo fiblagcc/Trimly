@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Search, MapPin, ArrowLeft, Navigation, CalendarCheck } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
@@ -57,9 +58,22 @@ export function ClientDashboard() {
 
 // ── Search ───────────────────────────────────────────────────────────────────
 function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
-  const [zipInput, setZipInput] = React.useState('')
-  const [zip, setZip] = React.useState<string | null>(null)
+  // Prefill + auto-search from the ZIP carried in from the landing hero.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialZip = searchParams.get('zip') ?? ''
+  const [zipInput, setZipInput] = React.useState(initialZip)
+  const [zip, setZip] = React.useState<string | null>(initialZip ? initialZip.trim() : null)
   const { data: shops, isFetching, isError, refetch } = useSearchShops(zip)
+
+  // Drop the ?zip= from the URL once consumed so it doesn't linger.
+  React.useEffect(() => {
+    if (searchParams.has('zip')) {
+      const next = new URLSearchParams(searchParams)
+      next.delete('zip')
+      setSearchParams(next, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault()

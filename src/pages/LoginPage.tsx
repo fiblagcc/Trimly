@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { useAuth, dashboardPath } from '@/lib/auth'
@@ -19,6 +19,7 @@ const ROLE_OPTIONS: { value: Role; label: string; hint: string }[] = [
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { session, profile, loading } = useAuth()
   const [mode, setMode] = React.useState<Mode>('login')
 
@@ -29,12 +30,18 @@ export function LoginPage() {
   const [errors, setErrors] = React.useState<Record<string, string>>({})
   const [submitting, setSubmitting] = React.useState(false)
 
-  // Already authenticated → bounce to the right dashboard.
+  // Already authenticated → bounce to the right dashboard. A client arriving from the
+  // landing hero carries a ?zip= which we forward into their search.
   React.useEffect(() => {
     if (!loading && session && profile) {
-      navigate(dashboardPath(profile.role), { replace: true })
+      const zip = searchParams.get('zip')
+      const dest =
+        profile.role === 'client' && zip
+          ? `/client?zip=${encodeURIComponent(zip)}`
+          : dashboardPath(profile.role)
+      navigate(dest, { replace: true })
     }
-  }, [loading, session, profile, navigate])
+  }, [loading, session, profile, navigate, searchParams])
 
   const validate = () => {
     const next: Record<string, string> = {}

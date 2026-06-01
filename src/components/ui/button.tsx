@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- co-export buttonVariants with the component (shadcn convention) */
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'

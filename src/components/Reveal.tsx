@@ -13,15 +13,13 @@ export function Reveal({
   delay?: number
 }) {
   const ref = React.useRef<HTMLDivElement>(null)
-  const [shown, setShown] = React.useState(false)
+  // When IntersectionObserver is unavailable, render shown from the start.
+  const [shown, setShown] = React.useState(() => typeof IntersectionObserver === 'undefined')
 
   React.useEffect(() => {
+    if (shown) return
     const el = ref.current
     if (!el) return
-    if (typeof IntersectionObserver === 'undefined') {
-      setShown(true)
-      return
-    }
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -33,7 +31,7 @@ export function Reveal({
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [shown])
 
   return (
     <div

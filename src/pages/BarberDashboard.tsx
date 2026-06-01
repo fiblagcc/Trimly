@@ -32,6 +32,12 @@ const NAV: { id: Section; label: string; icon: React.ElementType }[] = [
   { id: 'bookings', label: 'Incoming bookings', icon: Inbox },
 ]
 
+// Lower bound for the "add slot" picker — computed once at load (local time, trimmed
+// to minutes). Good enough to stop barbers picking a time in the past.
+const MIN_DATETIME_LOCAL = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+  .toISOString()
+  .slice(0, 16)
+
 export function BarberDashboard() {
   const { session, profile } = useAuth()
   const ownerId = session?.user.id
@@ -272,11 +278,6 @@ function AvailabilitySection({ shop }: { shop: Barbershop | null }) {
   const [startsAt, setStartsAt] = React.useState('')
   const [duration, setDuration] = React.useState(30)
 
-  const nowLocal = React.useMemo(() => {
-    const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    return d.toISOString().slice(0, 16)
-  }, [])
-
   if (!shop) {
     return (
       <section>
@@ -310,7 +311,7 @@ function AvailabilitySection({ shop }: { shop: Barbershop | null }) {
           <Input
             id="startsAt"
             type="datetime-local"
-            min={nowLocal}
+            min={MIN_DATETIME_LOCAL}
             value={startsAt}
             onChange={(e) => setStartsAt(e.target.value)}
           />

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- provider, hook, and helper live together by design */
 import * as React from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'

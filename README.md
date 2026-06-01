@@ -1,73 +1,101 @@
-# React + TypeScript + Vite
+# Trimly
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A barbershop appointment system. Built for our systems analysis project — the idea
+is simple: barbers subscribe to get listed, clients search by ZIP code and book an
+appointment, and the barber gets notified.
 
-Currently, two official plugins are available:
+Three types of users:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Client** — search for barbers in their area, book a slot, get directions on the
+  day of the appointment.
+- **Barber** — set up a shop, manage availability, and see bookings come in. We only
+  charge barbers (subscription), so there's a toggle for that.
+- **Admin** — handle support tickets and pull a quick report on how things are going.
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Vite + React + TypeScript
+- Tailwind + shadcn-style components (hand-built on top of Tailwind)
+- Supabase for auth + database (Postgres) + realtime
+- React Router + TanStack Query
+- Deployed on Vercel
 
-## Expanding the ESLint configuration
+I went with Supabase because it handles auth and the database in one place, and the
+row-level security meant I didn't have to write a separate backend just to keep each
+user's data private. React + Vite is what I'm comfortable in, and Tailwind let me get
+a clean, consistent look without spending the whole time fighting CSS.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Running it locally
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. `npm install`
+2. Copy `.env.example` to `.env` and fill in your Supabase URL and anon key.
+3. `npm run dev`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Setting up the database
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The schema, the row-level security policies, the signup trigger, and the booking
+function all live in `supabase/migrations/0001_init.sql`. The demo data is in
+`supabase/seed.sql`.
+
+The easiest way to run them is in the Supabase dashboard SQL editor (paste each file
+and run). Or, with a [Supabase access token](https://supabase.com/dashboard/account/tokens)
+set, you can apply them from the command line:
+
+```bash
+# PowerShell
+$env:SUPABASE_ACCESS_TOKEN = "sbp_..."
+node scripts/db-apply.mjs supabase/migrations/0001_init.sql
+node scripts/db-apply.mjs supabase/seed.sql
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+There's also a check that proves the RLS works — that one client can't read another
+client's data:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+node scripts/rls-check.mjs
 ```
+
+## Demo accounts
+
+(Demo only — these passwords are not for anything real.)
+
+- Client: `client@trimly.demo` / `trimly123`
+- Barber: `barber@trimly.demo` / `trimly123`
+- Admin: `admin@trimly.demo` / `trimly123`
+
+Try searching ZIP `10001` as the client to see the seeded barber (Fade & Co.).
+
+## Deploying
+
+It's a static Vite build, so Vercel just needs:
+
+- Build command `npm run build`, output `dist`
+- The two env vars (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) — the Supabase
+  Vercel integration can inject these automatically.
+
+`vercel.json` rewrites all routes to `index.html` so the client-side routing works on
+refresh.
+
+## What's done vs. what's next
+
+Working: signup/login with roles, ZIP search, booking with a live notification to the
+barber, get-directions, the subscription toggle, admin tickets and report.
+
+Not done yet (would be the next phase):
+
+- **Real payment / subscription billing.** Right now the subscription is just a toggle
+  — there's a note in the code (`src/lib/barber.ts`) where the Stripe integration would
+  go. Our project docs treat the bank as a later concern and we kept it that way.
+- **A proper barber notification app.** For the web version the barber gets a realtime
+  in-app toast; a push-notification mobile app would be the real version.
+- **Distance-based search.** Right now it's an exact ZIP match, but I store coordinates
+  on each shop, so adding a radius search later is just a query change.
+
+## Known limitations
+
+- The booking is race-safe (a Postgres function locks the slot row, so two people can't
+  grab the same time), but it doesn't try to handle every concurrent edge case beyond that.
+- Availability is managed as individual slots rather than recurring weekly hours, which
+  would be the nicer version.
+- Cancelling isn't built on the client side yet — the data model supports it, but I
+  focused on getting the core booking loop solid first.

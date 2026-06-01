@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* ─── Trimly Design Tokens ─────────────────────────────────── */
+
+@theme {
+  /* Brand colors */
+  --color-primary: #1D9E75;
+  --color-primary-dark: #0F6E56;
+  --color-accent: #FAC775;
+  --color-sand: #F1EFE8;
+  --color-ink: #1A1A1A;
+  --color-dark-anchor: #0A2620;
+
+  /* Badge palettes */
+  --color-badge-active-bg: #E1F5EE;
+  --color-badge-active-text: #0F6E56;
+  --color-badge-pending-bg: #FAEEDA;
+  --color-badge-pending-text: #854F0B;
+  --color-badge-inactive-bg: #F1EFE8;
+  --color-badge-inactive-text: #5F5E5A;
+
+  /* Typography */
+  --font-display: 'Fraunces', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Radius */
+  --radius-card: 1rem;
+  --radius-card-lg: 1.25rem;
+}
+
+/* ─── Base Styles ──────────────────────────────────────────── */
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-sand);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Display Typography ───────────────────────────────────── */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.heading-hero {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+.heading-page {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.heading-section {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+.label-section {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-ink) 50%, transparent);
+}
+
+/* ─── The Signature Editorial Card ─────────────────────────── */
+
+.editorial-card {
+  background: white;
+  border-radius: var(--radius-card-lg);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+  padding: 1.5rem;
+  transition: border-color 150ms ease;
+}
+
+.editorial-card:hover {
+  border-color: color-mix(in srgb, var(--color-ink) 16%, transparent);
+}
+
+/* ─── Metric Numbers (display font, tabular) ───────────────── */
+
+.metric-number {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ─── Section Spacing ──────────────────────────────────────── */
+
+.section-padding {
+  padding-top: clamp(3rem, 8vw, 8rem);
+  padding-bottom: clamp(3rem, 8vw, 8rem);
+}

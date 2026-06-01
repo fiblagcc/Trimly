@@ -137,6 +137,27 @@ as $$
   );
 $$;
 
+-- barber_sees_client(): true if the current user is a barber who owns a shop the
+-- given client has booked. SPEC §6 shows the booking client's NAME to the barber
+-- (the realtime toast and the incoming-bookings list), so the barber must be able
+-- to read that client's profile row — but ONLY for clients who booked them. This
+-- does NOT let one client read another client's profile, so the cross-account
+-- check still holds. SECURITY DEFINER avoids recursion back into profiles' policy.
+create or replace function public.barber_sees_client(client_profile uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1
+    from public.appointments a
+    join public.barbershops b on b.id = a.barbershop_id
+    where a.client_id = client_profile and b.owner_id = auth.uid()
+  );
+$$;
+
 -- book_slot(): atomically book an open slot. Locks the slot row (FOR UPDATE) so two
 -- clients racing for the same slot can't both win — the second sees it already booked.
 -- SECURITY DEFINER so it can flip the slot's is_booked (clients don't own slots), but
@@ -196,7 +217,11 @@ alter table public.support_tickets   enable row level security;
 -- profiles ────────────────────────────────────────────────
 drop policy if exists profiles_select on public.profiles;
 create policy profiles_select on public.profiles
-  for select using (id = auth.uid() or public.is_admin());
+  for select using (
+    id = auth.uid()
+    or public.is_admin()
+    or public.barber_sees_client(id)   -- a barber may read profiles of clients who booked them
+  );
 
 drop policy if exists profiles_update on public.profiles;
 create policy profiles_update on public.profiles

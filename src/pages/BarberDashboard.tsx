@@ -13,6 +13,7 @@ import {
   type ShopFormValues,
 } from '@/lib/barber'
 import type { Barbershop } from '@/lib/types'
+import { useBookingRealtime } from '@/lib/realtime'
 import { formatDateTime } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,6 +37,9 @@ export function BarberDashboard() {
   const ownerId = session?.user.id
   const { data: shop, isLoading } = useMyShop(ownerId)
   const [section, setSection] = React.useState<Section>('profile')
+
+  // Live booking notifications for this shop (Step 6).
+  useBookingRealtime(shop?.id)
 
   return (
     <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-10 lg:flex-row lg:gap-12">

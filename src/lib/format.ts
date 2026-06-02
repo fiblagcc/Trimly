@@ -23,6 +23,9 @@ export const formatDateTime = (iso: string) => dateTimeFmt.format(new Date(iso))
 export const formatDate = (iso: string) => dateFmt.format(new Date(iso))
 export const formatTime = (iso: string) => timeFmt.format(new Date(iso))
 
-// Google Maps directions deep link (SPEC §6, step 8).
-export const directionsUrl = (lat: number, lng: number) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+// Google Maps directions deep link. Destination is the shop's plain address (plus ZIP
+// for accuracy), so barbers never have to deal with coordinates.
+export const directionsUrl = (address: string, zip?: string | null) => {
+  const destination = [address, zip].filter(Boolean).join(', ')
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`
+}

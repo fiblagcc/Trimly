@@ -65,9 +65,9 @@ export function useBookSlot(clientId: string | undefined) {
   })
 }
 
-// ── My bookings (with shop name, coords, slot time) ──────────────────────────
+// ── My bookings (with shop name, address, slot time) ─────────────────────────
 export type MyBooking = Appointment & {
-  barbershop: Pick<Barbershop, 'shop_name' | 'address' | 'latitude' | 'longitude'> | null
+  barbershop: Pick<Barbershop, 'shop_name' | 'address' | 'zip'> | null
   slot: Pick<AvailabilitySlot, 'starts_at' | 'duration_min'> | null
 }
 
@@ -80,7 +80,7 @@ export function useMyBookings(clientId: string | undefined) {
         .from('appointments')
         .select(
           'id, slot_id, client_id, barbershop_id, service, status, created_at,' +
-            'barbershop:barbershops(shop_name, address, latitude, longitude),' +
+            'barbershop:barbershops(shop_name, address, zip),' +
             'slot:availability_slots(starts_at, duration_min)'
         )
         .eq('client_id', clientId!)

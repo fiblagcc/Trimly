@@ -340,10 +340,7 @@ function MyBookingsView() {
 function BookingRow({ booking: b }: { booking: MyBooking }) {
   const upcoming = b.slot ? new Date(b.slot.starts_at) > new Date() : false
   const canNavigate =
-    b.status === 'confirmed' &&
-    upcoming &&
-    b.barbershop?.latitude != null &&
-    b.barbershop?.longitude != null
+    b.status === 'confirmed' && upcoming && !!b.barbershop?.address?.trim()
 
   const statusVariant =
     b.status === 'confirmed' ? 'active' : b.status === 'completed' ? 'neutral' : 'inactive'
@@ -366,7 +363,7 @@ function BookingRow({ booking: b }: { booking: MyBooking }) {
         <Badge variant={statusVariant} className="capitalize">{b.status}</Badge>
         {canNavigate && (
           <a
-            href={directionsUrl(b.barbershop!.latitude!, b.barbershop!.longitude!)}
+            href={directionsUrl(b.barbershop!.address!, b.barbershop!.zip)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 rounded-xl border border-ink/15 px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-primary hover:text-primary-dark"

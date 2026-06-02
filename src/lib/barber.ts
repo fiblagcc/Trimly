@@ -19,9 +19,10 @@ export function useMyShop(ownerId: string | undefined) {
   })
 }
 
+// Barbers enter a plain address; directions are built from it. No coordinates.
 export type ShopFormValues = Pick<
   Barbershop,
-  'shop_name' | 'bio' | 'zip' | 'address' | 'latitude' | 'longitude'
+  'shop_name' | 'bio' | 'zip' | 'address'
 >
 
 export function useSaveShop(ownerId: string | undefined) {

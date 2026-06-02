@@ -129,8 +129,6 @@ function ProfileSection({
     bio: shop?.bio ?? '',
     zip: shop?.zip ?? '',
     address: shop?.address ?? '',
-    latitude: shop?.latitude ?? null,
-    longitude: shop?.longitude ?? null,
   })
   const [error, setError] = React.useState('')
 
@@ -180,29 +178,18 @@ function ProfileSection({
 
         <div className="space-y-5 border-t border-ink/8 pt-5">
           <p className="label-section">Location</p>
-          <Field label="Address" htmlFor="address">
-            <Input id="address" value={form.address ?? ''} onChange={(e) => set('address', e.target.value)} />
+          <Field
+            label="Street address"
+            htmlFor="address"
+            hint="The full address clients tap “Get directions” to. For example: 312 W 31st St, New York, NY."
+          >
+            <Input
+              id="address"
+              value={form.address ?? ''}
+              onChange={(e) => set('address', e.target.value)}
+              placeholder="Street, city, state"
+            />
           </Field>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Latitude" htmlFor="lat" hint="Used for the client's Get directions link.">
-              <Input
-                id="lat"
-                type="number"
-                step="any"
-                value={form.latitude ?? ''}
-                onChange={(e) => set('latitude', e.target.value === '' ? null : Number(e.target.value))}
-              />
-            </Field>
-            <Field label="Longitude" htmlFor="lng">
-              <Input
-                id="lng"
-                type="number"
-                step="any"
-                value={form.longitude ?? ''}
-                onChange={(e) => set('longitude', e.target.value === '' ? null : Number(e.target.value))}
-              />
-            </Field>
-          </div>
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

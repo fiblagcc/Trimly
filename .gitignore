@@ -48,3 +48,15 @@ skills-lock.json
 
 # Native C# desktop app (local only, kept out of the public web repo)
 /Trimly Desktop/
+
+# === trimly-phone-app branch only: Android / Kotlin build artifacts ===
+# (the web app ships from main; these keep Gradle/Studio junk out of the repo)
+.gradle/
+**/build/
+.idea/
+*.iml
+captures/
+.cxx/
+local.properties
+*.jks
+*.keystore

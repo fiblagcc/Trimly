@@ -60,3 +60,7 @@ captures/
 local.properties
 *.jks
 *.keystore
+
+# Kotlin compiler caches (AGP 8+)
+.kotlin/
+google-services.json

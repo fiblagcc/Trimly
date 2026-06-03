@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- ── Trimly brand tokens (match web + desktop, see BRAND.md) ── -->
+    <color name="primary">#1D9E75</color>          <!-- buttons, links, active, primary fills -->
+    <color name="primary_dark">#0F6E56</color>     <!-- logo, large headings, pressed -->
+    <color name="accent">#FAC775</color>           <!-- amber, one moment per screen -->
+    <color name="sand">#F1EFE8</color>             <!-- page background -->
+    <color name="surface">#FFFFFF</color>          <!-- cards, inputs -->
+    <color name="ink">#1A1A1A</color>              <!-- headings / body -->
+    <color name="ink_muted">#5B5A55</color>        <!-- secondary text (AA on sand) -->
+    <color name="ink_faint">#9A988F</color>        <!-- hints, inactive icons -->
+    <color name="dark_anchor">#0A2620</color>      <!-- the one dark surface per screen -->
+
+    <!-- Hairlines (ink with alpha) -->
+    <color name="outline">#141A1A1A</color>        <!-- ~8% ink, card borders -->
+    <color name="outline_strong">#261A1A1A</color> <!-- ~15% ink, input borders -->
+    <color name="divider">#E6E3D9</color>          <!-- visible hairline on sand -->
+
+    <!-- Status / badge palettes -->
+    <color name="badge_active_bg">#E1F5EE</color>
+    <color name="badge_active_text">#0F6E56</color>
+    <color name="badge_pending_bg">#FAEEDA</color>
+    <color name="badge_pending_text">#854F0B</color>
+    <color name="badge_inactive_bg">#E7E4DC</color>
+    <color name="badge_inactive_text">#5F5E5A</color>
+    <color name="error">#B91C1C</color>
+    <color name="error_bg">#FEE2E2</color>
+    <color name="favorite">#E0654C</color>
+</resources>

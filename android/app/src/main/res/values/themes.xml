@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.Trimly" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/sand</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/badge_active_bg</item>
+        <item name="colorOnPrimaryContainer">@color/badge_active_text</item>
+        <item name="android:statusBarColor">@color/sand</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.Trimly" parent="Base.Theme.Trimly" />
+
+    <style name="Theme.Trimly.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/primary_dark</item>
+        <item name="postSplashScreenTheme">@style/Theme.Trimly</item>
+    </style>
+</resources>

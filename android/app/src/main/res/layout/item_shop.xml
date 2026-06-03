@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shopCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:padding="8dp">
+
+    <!-- "Image" area (color block + emoji), with an Open pill -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:background="@drawable/bg_image_block">
+
+        <TextView
+            android:id="@+id/shopEmoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="✂️"
+            android:textSize="34sp"/>
+
+        <TextView
+            android:id="@+id/shopStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:text="Open"
+            android:textColor="@color/badge_active_text"
+            android:textSize="10sp"
+            android:background="@drawable/bg_badge_open"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/shopName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Shop"
+        android:textColor="@color/ink"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="2dp"/>
+
+    <TextView
+        android:id="@+id/shopAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/ink_muted"
+        android:textSize="11sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="1dp"/>
+
+    <TextView
+        android:id="@+id/shopRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New"
+        android:textColor="@color/badge_pending_text"
+        android:textSize="11sp"
+        android:background="@drawable/bg_badge_star"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="2dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/bookBtn"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:text="Book Now"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="19dp"
+        android:layout_marginTop="10dp"/>
+
+</LinearLayout>

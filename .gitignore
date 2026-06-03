@@ -45,3 +45,6 @@ e2e/shots/
 e2e/loop-login.mjs
 
 skills-lock.json
+
+# Native C# desktop app (local only, kept out of the public web repo)
+/Trimly Desktop/

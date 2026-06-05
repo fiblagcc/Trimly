@@ -1,109 +1,96 @@
 # Trimly
 
-A barbershop appointment app. The idea is simple: barbers subscribe to get listed,
-clients search by ZIP code and book an appointment, and the barber is notified the moment
-a booking comes in.
+A barbershop appointment app. Barbers subscribe to get listed, clients search by ZIP code
+and book a slot, and the barber is notified the moment a booking comes in.
+
+---
+
+> **You are on the `trimly-phone-app` branch — the Android client.**
+> The web app lives on [`main`](../../tree/main).
+> These two branches share the same Supabase backend but are separate codebases.
+> This branch is never merged into `main`.
+
+---
+
+## What Trimly does
 
 Three kinds of users:
 
-- **Client.** Search for barbers in their area, book a slot, and get directions on the day
-  of the appointment.
-- **Barber.** Set up a shop, manage availability, and watch bookings arrive. Trimly only
-  charges barbers, so there is a subscription toggle that controls whether the shop is
-  listed.
+- **Client.** Search for barbers nearby, pick a slot, and get directions on the day of
+  the appointment.
+- **Barber.** Set up a shop, manage availability, and watch bookings arrive live. A
+  subscription toggle controls whether the shop is listed.
 - **Admin.** Handle support tickets and pull a quick report on how the platform is doing.
 
-## Live demo
+## Clients (two separate apps, one backend)
 
-The app is deployed at **https://beta-trimly.vercel.app**. Sign in with the client
-account below and search ZIP `10001` to see the full booking flow.
+| Client | Branch | Tech | Live |
+|--------|--------|------|------|
+| Web app | `main` | React + TypeScript + Vite | [beta-trimly.vercel.app](https://beta-trimly.vercel.app) |
+| Android app | `trimly-phone-app` ← you are here | Kotlin + Android SDK 36 | — |
 
-## Stack
+## Android app
 
-- Vite + React + TypeScript
-- Tailwind with hand-built components (button, card, dialog, tabs, table, and the rest)
-- Supabase for auth, Postgres, Row Level Security, and Realtime
-- React Router and TanStack Query
-- Hosted on Vercel
+The Android app is in the `android/` folder. See [`android/README.md`](android/README.md)
+for build instructions.
 
-Supabase handles auth and the database in one place, and Row Level Security keeps each
-user's data private without a separate backend. React and Vite are fast to work in, and
-Tailwind kept the styling consistent without a lot of CSS overhead.
+### Screens
 
-## Running it locally
+| Screen | File |
+|--------|------|
+| Splash | `SplashActivity.kt` |
+| Onboarding | `OnboardingActivity.kt` |
+| Login | `MainActivity.kt` |
+| Register | `RegisterActivity.kt` |
+| Home (shop search + categories) | `HomeActivity.kt` |
+| Barbershop detail | `BarbershopActivity.kt` |
+| Booking (slot picker) | `BookingActivity.kt` |
+| Checkout (confirm + pay) | `CheckoutActivity.kt` |
+| My bookings | `BookingsActivity.kt` |
+| Favorites | `FavoritesActivity.kt` |
+| Notifications | `NotificationsActivity.kt` |
+| Profile | `ProfileActivity.kt` |
 
-1. `npm install`
-2. Copy `.env.example` to `.env` and fill in your Supabase URL and anon key.
-3. `npm run dev`
+### Tech stack
 
-### Setting up the database
+- **Language:** Kotlin
+- **UI:** Android Views + Material Design 3 (`com.google.android.material:material:1.11.0`)
+- **Auth + DB:** Supabase Kotlin SDK v3 (`auth-kt`, `postgrest-kt`)
+- **Min SDK:** 24 (Android 7.0), **Target SDK:** 36
+- **Splash:** AndroidX SplashScreen API
 
-The schema, the Row Level Security policies, the signup trigger, and the booking function
-all live in `supabase/migrations/0001_init.sql`. The demo data is in `supabase/seed.sql`.
+## Shared backend
 
-The easiest way to run them is in the Supabase dashboard SQL editor (paste each file and
-run). With a [Supabase access token](https://supabase.com/dashboard/account/tokens) set,
-you can also apply them from the command line:
+Both clients talk to the same Supabase project (`madsedhycdiattoaypyl`). The schema,
+Row Level Security policies, and seed data live in:
 
-```bash
-# PowerShell
-$env:SUPABASE_ACCESS_TOKEN = "sbp_..."
-node scripts/db-apply.mjs supabase/migrations/0001_init.sql
-node scripts/db-apply.mjs supabase/seed.sql
-```
+- `supabase/migrations/0001_init.sql` — schema + RLS + triggers
+- `supabase/seed.sql` — demo accounts and a seeded shop in ZIP 10001
 
-There is also a check that proves the RLS works, that one client cannot read another
-client's data:
-
-```bash
-node scripts/rls-check.mjs
-```
-
-And an end-to-end check that walks the whole booking loop against the live database:
-
-```bash
-node scripts/verify-e2e.mjs
-```
+Booking goes through the `book_slot` RPC. Core tables: `profiles`, `barbershops`,
+`availability_slots`, `appointments`, `tickets`.
 
 ## Demo accounts
 
-These passwords are for the demo only.
+Password for all three: `trimly123`
 
-- Client: `client@trimly.demo` / `trimly123`
-- Barber: `barber@trimly.demo` / `trimly123`
-- Admin: `admin@trimly.demo` / `trimly123`
+| Role | Email |
+|------|-------|
+| Client | `client@trimly.demo` |
+| Barber | `barber@trimly.demo` |
+| Admin | `admin@trimly.demo` |
 
-Search ZIP `10001` as the client to find the seeded barber (Fade & Co.).
+Search ZIP `10001` as the client to find the seeded shop (Fade & Co.).
 
-## Deploying
+## Brand
 
-It is a static Vite build, so Vercel needs:
+Colors, typography, and spacing guidelines for the Android app are in
+[`BRAND.md`](BRAND.md). The app icon assets are in [`brand-assets/`](brand-assets/).
 
-- Build command `npm run build`, output directory `dist`
-- The two env vars (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). The Supabase Vercel
-  integration can inject these for you.
+## What is next
 
-`vercel.json` rewrites all routes to `index.html` so client-side routing works on refresh.
-
-## What works and what is next
-
-Working today: signup and login with roles, ZIP search, booking with a live notification
-to the barber, get-directions, the subscription toggle, and the admin tickets and report.
-
-Next up:
-
-- **Real subscription billing.** The subscription is a toggle right now, with a note in the
-  code (`src/lib/barber.ts`) marking where Stripe Checkout would hook in.
-- **A barber notification app.** The web version uses a realtime in-app toast; a push
-  notification on mobile would be the fuller version.
-- **Distance-based search.** Search matches ZIP exactly today, but every shop stores
-  coordinates, so a radius search is a query change away.
-
-## Known limitations
-
-- Booking is race-safe (a Postgres function locks the slot row so two people cannot grab
-  the same time), but it does not try to handle every concurrent edge case beyond that.
-- Availability is managed as individual slots rather than recurring weekly hours, which
-  would be the nicer version.
-- Client-side cancelling is not built yet. The data model supports it; the core booking
-  loop came first.
+- Push notifications when a new booking arrives (the web app uses an in-app realtime
+  toast; mobile should get a push).
+- Distance-based search — every shop stores coordinates, so a radius query is a small
+  change.
+- Client-side booking cancellation — the data model supports it, the UI is not built yet.

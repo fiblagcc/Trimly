@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Search, MapPin, ArrowLeft, Navigation, CalendarCheck } from 'lucide-react'
+import { Search, MapPin, ArrowLeft, Navigation, CalendarCheck, Heart, Star, Clock } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import {
   useSearchShops,
@@ -9,11 +9,21 @@ import {
   useBookSlot,
   useMyBookings,
   SlotTakenError,
+  useShopMenu,
+  useShopHours,
+  useShopOpenNow,
+  useShopRating,
+  useShopReviews,
+  useMyReviews,
+  useLeaveReview,
+  AlreadyReviewedError,
+  useFavorites,
+  useToggleFavorite,
   type MyBooking,
 } from '@/lib/client'
-import type { AvailabilitySlot, Barbershop } from '@/lib/types'
+import type { AvailabilitySlot, Barbershop, BusinessHour, Review } from '@/lib/types'
 import { SERVICES } from '@/lib/types'
-import { formatDateTime, directionsUrl } from '@/lib/format'
+import { formatDateTime, formatPrice, formatClock, DAY_NAMES_LONG, directionsUrl } from '@/lib/format'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,6 +39,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] // Monday-first
+
 export function ClientDashboard() {
   const [selectedShop, setSelectedShop] = React.useState<Barbershop | null>(null)
 
@@ -37,6 +49,7 @@ export function ClientDashboard() {
       <Tabs defaultValue="find">
         <TabsList className="mb-8">
           <TabsTrigger value="find">Find a barber</TabsTrigger>
+          <TabsTrigger value="saved">Saved</TabsTrigger>
           <TabsTrigger value="bookings">My bookings</TabsTrigger>
         </TabsList>
 
@@ -48,6 +61,14 @@ export function ClientDashboard() {
           )}
         </TabsContent>
 
+        <TabsContent value="saved">
+          {selectedShop ? (
+            <ShopDetail shop={selectedShop} onBack={() => setSelectedShop(null)} />
+          ) : (
+            <SavedView onSelect={setSelectedShop} />
+          )}
+        </TabsContent>
+
         <TabsContent value="bookings">
           <MyBookingsView />
         </TabsContent>
@@ -56,16 +77,90 @@ export function ClientDashboard() {
   )
 }
 
+// ── Small shared display bits ─────────────────────────────────────────────────
+function Stars({ value, className = 'h-4 w-4' }: { value: number; className?: string }) {
+  return (
+    <span className="inline-flex" aria-label={`${value} out of 5`}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star
+          key={i}
+          className={className + ' ' + (i <= Math.round(value) ? 'fill-accent text-accent' : 'text-ink/20')}
+        />
+      ))}
+    </span>
+  )
+}
+
+function RatingInline({ shopId }: { shopId: string }) {
+  const { data } = useShopRating(shopId)
+  if (!data || !data.review_count) return <span className="text-xs text-ink/45">No reviews yet</span>
+  return (
+    <span className="inline-flex items-center gap-1 text-sm text-ink/70">
+      <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+      <span className="font-medium text-ink">{Number(data.avg_rating).toFixed(1)}</span>
+      <span className="text-ink/55">({data.review_count})</span>
+    </span>
+  )
+}
+
+function FavHeart({ shopId, size = 'md' }: { shopId: string; size?: 'sm' | 'md' }) {
+  const { session } = useAuth()
+  const userId = session?.user.id
+  const { data: favs } = useFavorites(userId)
+  const toggle = useToggleFavorite(userId)
+  const on = !!favs?.some((s) => s.id === shopId)
+  const px = size === 'sm' ? 'h-8 w-8' : 'h-9 w-9'
+  return (
+    <button
+      type="button"
+      aria-label={on ? 'Remove from saved' : 'Save shop'}
+      aria-pressed={on}
+      onClick={(e) => {
+        e.stopPropagation()
+        toggle.mutate({ shopId, on: !on })
+      }}
+      className={
+        'inline-flex shrink-0 items-center justify-center rounded-full border border-ink/10 bg-white/70 transition-colors hover:border-primary/40 ' +
+        px
+      }
+    >
+      <Heart className={'h-4 w-4 ' + (on ? 'fill-primary text-primary' : 'text-ink/45')} />
+    </button>
+  )
+}
+
+function ShopCard({ shop, onSelect }: { shop: Barbershop; onSelect: (s: Barbershop) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(shop)}
+      className="editorial-card text-left transition-transform duration-150 hover:-translate-y-0.5"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="heading-section">{shop.shop_name}</h3>
+        <FavHeart shopId={shop.id} size="sm" />
+      </div>
+      <div className="mt-2">
+        <RatingInline shopId={shop.id} />
+      </div>
+      {shop.bio && <p className="mt-2 line-clamp-2 text-sm text-ink/70">{shop.bio}</p>}
+      {shop.address && (
+        <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
+          <MapPin className="h-3.5 w-3.5" /> {shop.address}
+        </p>
+      )}
+    </button>
+  )
+}
+
 // ── Search ───────────────────────────────────────────────────────────────────
 function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
-  // Prefill + auto-search from the ZIP carried in from the landing hero.
   const [searchParams, setSearchParams] = useSearchParams()
   const initialZip = searchParams.get('zip') ?? ''
   const [zipInput, setZipInput] = React.useState(initialZip)
   const [zip, setZip] = React.useState<string | null>(initialZip ? initialZip.trim() : null)
   const { data: shops, isFetching, isError, refetch } = useSearchShops(zip)
 
-  // Drop the ?zip= from the URL once consumed so it doesn't linger.
   React.useEffect(() => {
     if (searchParams.has('zip')) {
       const next = new URLSearchParams(searchParams)
@@ -82,7 +177,6 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
 
   return (
     <div>
-      {/* Search hero. Page-scale type here; the 72px hero is reserved for the landing. */}
       <div className="max-w-2xl">
         <h1 className="heading-page">Find a barber near you.</h1>
         <p className="mt-3 text-lg text-ink/70">
@@ -113,11 +207,7 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
         {zip === null ? (
           <PreSearchGuide />
         ) : isFetching ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-          </div>
+          <CardGridSkeleton />
         ) : isError ? (
           <div className="editorial-card max-w-md">
             <p className="text-ink/70">Something went wrong searching.</p>
@@ -139,23 +229,7 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
             </p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {shops.map((shop) => (
-                <button
-                  key={shop.id}
-                  type="button"
-                  onClick={() => onSelect(shop)}
-                  className="editorial-card text-left transition-transform duration-150 hover:-translate-y-0.5"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="heading-section">{shop.shop_name}</h3>
-                    <Badge variant="active">Active</Badge>
-                  </div>
-                  {shop.bio && <p className="mt-2 line-clamp-3 text-sm text-ink/70">{shop.bio}</p>}
-                  {shop.address && (
-                    <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
-                      <MapPin className="h-3.5 w-3.5" /> {shop.address}
-                    </p>
-                  )}
-                </button>
+                <ShopCard key={shop.id} shop={shop} onSelect={onSelect} />
               ))}
             </div>
           </>
@@ -165,8 +239,36 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
   )
 }
 
-// Quiet onboarding shown before the first search, so the page teaches instead of
-// sitting empty. No fake data, just the three honest steps.
+// ── Saved (favorites) ─────────────────────────────────────────────────────────
+function SavedView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
+  const { session } = useAuth()
+  const { data: shops, isLoading } = useFavorites(session?.user.id)
+
+  return (
+    <div>
+      <h1 className="heading-page">Saved barbers</h1>
+      <p className="mt-1 text-ink/70">Shops you’ve saved. Tap the heart on any shop to add it here.</p>
+
+      <div className="mt-6">
+        {isLoading ? (
+          <CardGridSkeleton />
+        ) : !shops || shops.length === 0 ? (
+          <div className="editorial-card max-w-md">
+            <p className="font-medium text-ink">Nothing saved yet.</p>
+            <p className="mt-1 text-sm text-ink/70">Find a barber and tap the heart to save them for later.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {shops.map((shop) => (
+              <ShopCard key={shop.id} shop={shop} onSelect={onSelect} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 const GUIDE = [
   { n: '01', title: 'Search your ZIP', body: 'See the barbers near you taking bookings right now.' },
   { n: '02', title: 'Pick a time', body: 'Choose an open slot and the service you want.' },
@@ -190,18 +292,43 @@ function PreSearchGuide() {
   )
 }
 
+function CardGridSkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Skeleton className="h-44 w-full" />
+      <Skeleton className="h-44 w-full" />
+      <Skeleton className="h-44 w-full" />
+    </div>
+  )
+}
+
 // ── Shop detail + booking ─────────────────────────────────────────────────────
 function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) {
   const { session } = useAuth()
   const { data: slots, isLoading } = useShopOpenSlots(shop.id)
+  const { data: menu } = useShopMenu(shop.id)
+  const { data: hours } = useShopHours(shop.id)
+  const { data: openNow } = useShopOpenNow(shop.id)
+  const { data: rating } = useShopRating(shop.id)
+  const { data: reviews } = useShopReviews(shop.id)
   const book = useBookSlot(session?.user.id)
   const [pending, setPending] = React.useState<AvailabilitySlot | null>(null)
-  const [service, setService] = React.useState<string>(SERVICES[0])
+  const [pick, setPick] = React.useState(0)
+
+  // Booking options come from the shop's real menu, falling back to the built-in list.
+  const options = React.useMemo(
+    () =>
+      menu && menu.length > 0
+        ? menu.map((s) => ({ id: s.id as string | null, name: s.name, label: `${s.name} · ${formatPrice(s.price_cents)}` }))
+        : SERVICES.map((s) => ({ id: null as string | null, name: s, label: s })),
+    [menu]
+  )
 
   const confirm = async () => {
     if (!pending) return
+    const opt = options[pick] ?? options[0]
     try {
-      await book.mutateAsync({ slotId: pending.id, shopId: shop.id, service })
+      await book.mutateAsync({ slotId: pending.id, shopId: shop.id, service: opt.name, serviceId: opt.id })
       toast.success('Booked! See it under “My bookings”.')
       setPending(null)
     } catch (err) {
@@ -224,17 +351,57 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
         <ArrowLeft className="h-4 w-4" /> Back to results
       </button>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
         {/* Shop info */}
         <div>
-          <Badge variant="active">Active</Badge>
-          <h1 className="heading-page mt-3">{shop.shop_name}</h1>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge variant="active">Active</Badge>
+                {openNow !== undefined && (
+                  <Badge variant={openNow ? 'active' : 'inactive'}>{openNow ? 'Open now' : 'Closed'}</Badge>
+                )}
+              </div>
+              <h1 className="heading-page mt-3">{shop.shop_name}</h1>
+            </div>
+            <FavHeart shopId={shop.id} />
+          </div>
+
+          {rating && rating.review_count > 0 && (
+            <div className="mt-3 flex items-center gap-2">
+              <Stars value={Number(rating.avg_rating)} />
+              <span className="text-sm text-ink/70">
+                {Number(rating.avg_rating).toFixed(1)} · {rating.review_count} review
+                {rating.review_count > 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+
           {shop.bio && <p className="mt-3 text-ink/70">{shop.bio}</p>}
           {shop.address && (
             <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
               <MapPin className="h-4 w-4" /> {shop.address}
               {shop.zip ? `, ${shop.zip}` : ''}
             </p>
+          )}
+
+          <HoursList hours={hours ?? []} />
+
+          {menu && menu.length > 0 && (
+            <div className="mt-6">
+              <p className="label-section mb-3">Services</p>
+              <ul className="divide-y divide-ink/8 overflow-hidden rounded-xl border border-ink/8 bg-white">
+                {menu.map((s) => (
+                  <li key={s.id} className="flex items-center justify-between px-4 py-3">
+                    <div>
+                      <p className="font-medium text-ink">{s.name}</p>
+                      <p className="text-xs text-ink/55">{s.duration_min} min</p>
+                    </div>
+                    <span className="font-medium text-ink">{formatPrice(s.price_cents)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
 
@@ -256,7 +423,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
                   key={slot.id}
                   type="button"
                   onClick={() => {
-                    setService(SERVICES[0])
+                    setPick(0)
                     setPending(slot)
                   }}
                   className="rounded-xl border border-ink/15 px-4 py-3 text-left text-sm font-medium text-ink transition-colors duration-150 hover:border-primary hover:bg-badge-active-bg"
@@ -270,6 +437,9 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
         </div>
       </div>
 
+      {/* Reviews */}
+      <ReviewsList reviews={reviews ?? []} />
+
       {/* Booking confirmation */}
       <Dialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
         <DialogHeader>
@@ -282,10 +452,10 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
 
         <div className="space-y-1.5">
           <Label htmlFor="service">Service</Label>
-          <Select id="service" value={service} onChange={(e) => setService(e.target.value)}>
-            {SERVICES.map((s) => (
-              <option key={s} value={s}>
-                {s}
+          <Select id="service" value={pick} onChange={(e) => setPick(Number(e.target.value))}>
+            {options.map((o, i) => (
+              <option key={i} value={i}>
+                {o.label}
               </option>
             ))}
           </Select>
@@ -304,10 +474,55 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
   )
 }
 
+function HoursList({ hours }: { hours: BusinessHour[] }) {
+  if (!hours.length) return null
+  return (
+    <div className="mt-6">
+      <p className="label-section mb-3 flex items-center gap-1.5">
+        <Clock className="h-3.5 w-3.5" /> Hours
+      </p>
+      <ul className="space-y-1 text-sm">
+        {DAY_ORDER.map((d) => {
+          const row = hours.find((h) => h.day_of_week === d)
+          return (
+            <li key={d} className="flex justify-between">
+              <span className="text-ink/70">{DAY_NAMES_LONG[d]}</span>
+              <span className="text-ink">
+                {!row || row.is_closed
+                  ? 'Closed'
+                  : `${formatClock(row.open_time)} – ${formatClock(row.close_time)}`}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+function ReviewsList({ reviews }: { reviews: Review[] }) {
+  if (!reviews.length) return null
+  return (
+    <div className="mt-10 max-w-2xl">
+      <p className="label-section mb-4">Reviews</p>
+      <ul className="space-y-3">
+        {reviews.map((r) => (
+          <li key={r.id} className="editorial-card">
+            <Stars value={r.rating} className="h-3.5 w-3.5" />
+            {r.comment && <p className="mt-2 text-sm text-ink/80">{r.comment}</p>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 // ── My bookings ───────────────────────────────────────────────────────────────
 function MyBookingsView() {
   const { session } = useAuth()
   const { data: bookings, isLoading } = useMyBookings(session?.user.id)
+  const { data: reviewed } = useMyReviews(session?.user.id)
+  const [review, setReview] = React.useState<MyBooking | null>(null)
 
   return (
     <div>
@@ -328,19 +543,36 @@ function MyBookingsView() {
         ) : (
           <ul className="max-w-2xl space-y-3">
             {bookings.map((b) => (
-              <BookingRow key={b.id} booking={b} />
+              <BookingRow
+                key={b.id}
+                booking={b}
+                reviewed={!!reviewed?.has(b.id)}
+                onReview={() => setReview(b)}
+              />
             ))}
           </ul>
         )}
       </div>
+
+      <ReviewDialog booking={review} onClose={() => setReview(null)} />
     </div>
   )
 }
 
-function BookingRow({ booking: b }: { booking: MyBooking }) {
-  const upcoming = b.slot ? new Date(b.slot.starts_at) > new Date() : false
-  const canNavigate =
-    b.status === 'confirmed' && upcoming && !!b.barbershop?.address?.trim()
+function BookingRow({
+  booking: b,
+  reviewed,
+  onReview,
+}: {
+  booking: MyBooking
+  reviewed: boolean
+  onReview: () => void
+}) {
+  const startsAt = b.slot ? new Date(b.slot.starts_at) : null
+  const upcoming = startsAt ? startsAt > new Date() : false
+  const past = startsAt ? startsAt < new Date() : false
+  const canNavigate = b.status === 'confirmed' && upcoming && !!b.barbershop?.address?.trim()
+  const canReview = b.status !== 'cancelled' && past && !reviewed
 
   const statusVariant =
     b.status === 'confirmed' ? 'active' : b.status === 'completed' ? 'neutral' : 'inactive'
@@ -360,7 +592,14 @@ function BookingRow({ booking: b }: { booking: MyBooking }) {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <Badge variant={statusVariant} className="capitalize">{b.status}</Badge>
+        <Badge variant={statusVariant} className="capitalize">
+          {b.status}
+        </Badge>
+        {canReview && (
+          <Button variant="outline" size="sm" onClick={onReview}>
+            <Star className="mr-1.5 h-3.5 w-3.5" /> Review
+          </Button>
+        )}
         {canNavigate && (
           <a
             href={directionsUrl(b.barbershop!.address!, b.barbershop!.zip)}
@@ -373,5 +612,93 @@ function BookingRow({ booking: b }: { booking: MyBooking }) {
         )}
       </div>
     </li>
+  )
+}
+
+function ReviewDialog({ booking, onClose }: { booking: MyBooking | null; onClose: () => void }) {
+  const { session } = useAuth()
+  const leave = useLeaveReview(session?.user.id)
+  const [rating, setRating] = React.useState(5)
+  const [comment, setComment] = React.useState('')
+
+  // Reset the form whenever a different booking is opened.
+  const openId = booking?.id ?? null
+  const lastId = React.useRef<string | null>(null)
+  if (openId !== lastId.current) {
+    lastId.current = openId
+    if (openId) {
+      // safe: runs once per open, guarded by the id check
+      if (rating !== 5) setRating(5)
+      if (comment !== '') setComment('')
+    }
+  }
+
+  const submit = async () => {
+    if (!booking?.barbershop_id) return
+    try {
+      await leave.mutateAsync({
+        shopId: booking.barbershop_id,
+        appointmentId: booking.id,
+        rating,
+        comment,
+      })
+      toast.success('Thanks for the review!')
+      onClose()
+    } catch (err) {
+      if (err instanceof AlreadyReviewedError) {
+        toast.error(err.message)
+        onClose()
+      } else {
+        toast.error(err instanceof Error ? err.message : 'Could not submit review.')
+      }
+    }
+  }
+
+  return (
+    <Dialog open={!!booking} onOpenChange={(o) => !o && onClose()}>
+      <DialogHeader>
+        <DialogTitle>Leave a review</DialogTitle>
+        <DialogDescription>{booking?.barbershop?.shop_name ?? 'Your visit'}</DialogDescription>
+      </DialogHeader>
+
+      <div className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="rating">Rating</Label>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`${i} star${i > 1 ? 's' : ''}`}
+                onClick={() => setRating(i)}
+                className="p-0.5"
+              >
+                <Star className={'h-7 w-7 ' + (i <= rating ? 'fill-accent text-accent' : 'text-ink/25')} />
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="comment">Comment (optional)</Label>
+          <textarea
+            id="comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={3}
+            placeholder="How was your cut?"
+            className="flex w-full rounded-xl border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/55 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+          />
+        </div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose} disabled={leave.isPending}>
+          Cancel
+        </Button>
+        <Button onClick={submit} disabled={leave.isPending}>
+          {leave.isPending ? 'Submitting…' : 'Submit review'}
+        </Button>
+      </DialogFooter>
+    </Dialog>
   )
 }

@@ -353,16 +353,10 @@ class BarberDashboardActivity : AppCompatActivity() {
     private fun switchTab(tab: String) {
         bTabs.forEach { t ->
             findViewById<View>(t.section).visibility = if (t.name == tab) View.VISIBLE else View.GONE
-            val slot = findViewById<LinearLayout>(t.slot)
             val pill = findViewById<LinearLayout>(t.pill)
             val ico = findViewById<AppCompatImageView>(t.ico)
             val lbl = findViewById<TextView>(t.lbl)
-            val active = t.name == tab
-            // Active tab expands to fit its label on one line; inactive shrink to icon only.
-            val lp = slot.layoutParams as LinearLayout.LayoutParams
-            if (active) { lp.width = 0; lp.weight = 1f } else { lp.width = LinearLayout.LayoutParams.WRAP_CONTENT; lp.weight = 0f }
-            slot.layoutParams = lp
-            if (active) {
+            if (t.name == tab) {
                 pill.setBackgroundResource(R.drawable.bg_nav_pill)
                 ico.setColorFilter(Color.WHITE)
                 lbl.visibility = View.VISIBLE

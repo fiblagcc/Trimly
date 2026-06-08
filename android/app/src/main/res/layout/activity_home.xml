@@ -338,8 +338,8 @@
                 android:layout_height="44dp"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iconHome"
@@ -356,9 +356,9 @@
                     android:layout_height="wrap_content"
                     android:text="Home"
                     android:textColor="#FFFFFF"
-                    android:textSize="13sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:visibility="gone"/>
 
             </LinearLayout>
@@ -380,8 +380,8 @@
                 android:layout_height="44dp"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iconBookings"
@@ -398,9 +398,9 @@
                     android:layout_height="wrap_content"
                     android:text="Bookings"
                     android:textColor="#FFFFFF"
-                    android:textSize="13sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:visibility="gone"/>
 
             </LinearLayout>
@@ -422,8 +422,8 @@
                 android:layout_height="44dp"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iconFavorites"
@@ -440,9 +440,9 @@
                     android:layout_height="wrap_content"
                     android:text="Favorites"
                     android:textColor="#FFFFFF"
-                    android:textSize="13sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:visibility="gone"/>
 
             </LinearLayout>
@@ -464,8 +464,8 @@
                 android:layout_height="44dp"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iconProfile"
@@ -482,9 +482,9 @@
                     android:layout_height="wrap_content"
                     android:text="Profile"
                     android:textColor="#FFFFFF"
-                    android:textSize="13sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:visibility="gone"/>
 
             </LinearLayout>

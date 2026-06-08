@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { Appointment, AvailabilitySlot, Barbershop, Profile } from '@/lib/types'
+import type {
+  Appointment,
+  AvailabilitySlot,
+  Barbershop,
+  BusinessHour,
+  Profile,
+  Service,
+} from '@/lib/types'
 
 // ── The barber's own shop (one per barber) ──────────────────────────────────
 export function useMyShop(ownerId: string | undefined) {
@@ -120,8 +127,9 @@ export function useDeleteSlot(shopId: string | undefined) {
 
 // ── Incoming bookings for this shop (with client name + slot time) ───────────
 export type IncomingBooking = Appointment & {
-  client: Pick<Profile, 'full_name'> | null
+  client: Pick<Profile, 'full_name' | 'phone' | 'email'> | null
   slot: Pick<AvailabilitySlot, 'starts_at' | 'duration_min'> | null
+  service_row: Pick<Service, 'name' | 'price_cents'> | null
 }
 
 export function useIncomingBookings(shopId: string | undefined) {
@@ -132,14 +140,127 @@ export function useIncomingBookings(shopId: string | undefined) {
       const { data, error } = await supabase
         .from('appointments')
         .select(
-          'id, slot_id, client_id, barbershop_id, service, status, created_at,' +
-            'client:profiles!appointments_client_id_fkey(full_name),' +
-            'slot:availability_slots(starts_at, duration_min)'
+          'id, slot_id, client_id, barbershop_id, service, service_id, status, created_at,' +
+            'client:profiles!appointments_client_id_fkey(full_name, phone, email),' +
+            'slot:availability_slots(starts_at, duration_min),' +
+            'service_row:services(name, price_cents)'
         )
         .eq('barbershop_id', shopId!)
         .order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []) as unknown as IncomingBooking[]
     },
+  })
+}
+
+// ── Booking actions: the owning barber marks a booking complete or cancelled ──
+export function useUpdateBookingStatus(shopId: string | undefined) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; status: 'completed' | 'cancelled' }) => {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: input.status })
+        .eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['incoming-bookings', shopId] }),
+  })
+}
+
+// ── Services: a shop's bookable menu with price (cents) + duration ────────────
+export function useShopServices(shopId: string | undefined) {
+  return useQuery({
+    queryKey: ['shop-services', shopId],
+    enabled: !!shopId,
+    queryFn: async (): Promise<Service[]> => {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('barbershop_id', shopId!)
+        .order('created_at', { ascending: true })
+      if (error) throw error
+      return data ?? []
+    },
+  })
+}
+
+export type ServiceFormValues = {
+  name: string
+  price_cents: number
+  duration_min: number
+  is_active: boolean
+}
+
+export function useAddService(shopId: string | undefined) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (values: ServiceFormValues) => {
+      const { error } = await supabase.from('services').insert({ barbershop_id: shopId, ...values })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['shop-services', shopId] }),
+  })
+}
+
+export function useUpdateService(shopId: string | undefined) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { id: string; values: Partial<ServiceFormValues> }) => {
+      const { error } = await supabase.from('services').update(input.values).eq('id', input.id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['shop-services', shopId] }),
+  })
+}
+
+export function useDeleteService(shopId: string | undefined) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('services').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['shop-services', shopId] }),
+  })
+}
+
+// ── Business hours: one row per weekday (0 = Sun .. 6 = Sat) ───────────────────
+export function useShopHours(shopId: string | undefined) {
+  return useQuery({
+    queryKey: ['shop-hours', shopId],
+    enabled: !!shopId,
+    queryFn: async (): Promise<BusinessHour[]> => {
+      const { data, error } = await supabase
+        .from('business_hours')
+        .select('*')
+        .eq('barbershop_id', shopId!)
+        .order('day_of_week', { ascending: true })
+      if (error) throw error
+      return data ?? []
+    },
+  })
+}
+
+export type HoursRow = {
+  day_of_week: number
+  open_time: string
+  close_time: string
+  is_closed: boolean
+}
+
+export function useSaveHours(shopId: string | undefined) {
+  const qc = useQueryClient()
+  return useMutation({
+    // Upsert all seven days on the (barbershop_id, day_of_week) unique key. Closed days
+    // still carry valid open/close times to satisfy the close_time > open_time check.
+    mutationFn: async (rows: HoursRow[]) => {
+      const payload = rows.map((r) => ({ barbershop_id: shopId, ...r }))
+      const { error } = await supabase
+        .from('business_hours')
+        .upsert(payload, { onConflict: 'barbershop_id,day_of_week' })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['shop-hours', shopId] }),
   })
 }

@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/sand">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/barberTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Shop"
+                app:fontFamily="@font/fraunces_semibold"
+                android:textColor="@color/ink"
+                android:textSize="26sp"/>
+
+            <TextView
+                android:id="@+id/barberSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barber dashboard"
+                android:textColor="@color/ink_muted"
+                android:textSize="12sp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/logoutBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Log out"
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:padding="6dp"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="32dp">
+
+            <!-- Subscription card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:padding="16dp"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Subscription"
+                        android:textColor="@color/ink"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/statusBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="● Not live"
+                        android:textColor="@color/badge_inactive_text"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"/>
+
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/subToggleBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:text="Activate"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="21dp"/>
+
+            </LinearLayout>
+
+            <!-- Shop profile card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="16dp"
+                android:layout_marginBottom="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shop profile"
+                    app:fontFamily="@font/fraunces_semibold"
+                    android:textColor="@color/ink"
+                    android:textSize="17sp"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView style="@style/BarberLabel" android:text="SHOP NAME"/>
+                <EditText android:id="@+id/inputShopName" style="@style/BarberInput" android:hint="e.g. Fade &amp; Co." android:inputType="text"/>
+
+                <TextView style="@style/BarberLabel" android:text="ADDRESS"/>
+                <EditText android:id="@+id/inputAddress" style="@style/BarberInput" android:hint="123 Main St" android:inputType="textPostalAddress"/>
+
+                <TextView style="@style/BarberLabel" android:text="ZIP"/>
+                <EditText android:id="@+id/inputZip" style="@style/BarberInput" android:hint="10001" android:inputType="number"/>
+
+                <TextView style="@style/BarberLabel" android:text="ABOUT"/>
+                <EditText android:id="@+id/inputBio" style="@style/BarberInput" android:hint="Tell clients about your shop" android:inputType="textMultiLine" android:minLines="2"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/saveShopBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Save shop"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="24dp"
+                    android:layout_marginTop="6dp"/>
+
+            </LinearLayout>
+
+            <!-- Services card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="16dp"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Services &amp; prices"
+                        app:fontFamily="@font/fraunces_semibold"
+                        android:textColor="@color/ink"
+                        android:textSize="17sp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/addServiceBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="+ Add"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:backgroundTint="@color/primary"
+                        app:cornerRadius="19dp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/servicesEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No services yet. Tap Add to set your prices."
+                    android:textColor="@color/ink_muted"
+                    android:textSize="13sp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"/>
+
+                <LinearLayout
+                    android:id="@+id/servicesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+
+            <!-- Availability card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="16dp"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Availability"
+                        app:fontFamily="@font/fraunces_semibold"
+                        android:textColor="@color/ink"
+                        android:textSize="17sp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/addSlotBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:text="+ Add"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:backgroundTint="@color/primary"
+                        app:cornerRadius="19dp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/slotsEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No upcoming slots. Tap Add to create one."
+                    android:textColor="@color/ink_muted"
+                    android:textSize="13sp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"/>
+
+                <LinearLayout
+                    android:id="@+id/slotsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+
+            <!-- Opening hours card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="16dp"
+                android:layout_marginBottom="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Opening hours"
+                    app:fontFamily="@font/fraunces_semibold"
+                    android:textColor="@color/ink"
+                    android:textSize="17sp"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tap a time to change it. This sets your Open/Closed status for clients."
+                    android:textColor="@color/ink_muted"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="8dp"/>
+
+                <LinearLayout
+                    android:id="@+id/hoursContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/saveHoursBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="Save hours"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="23dp"
+                    android:layout_marginTop="10dp"/>
+
+            </LinearLayout>
+
+            <!-- Incoming bookings card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_card"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Incoming bookings"
+                        app:fontFamily="@font/fraunces_semibold"
+                        android:textColor="@color/ink"
+                        android:textSize="17sp"/>
+
+                    <TextView
+                        android:id="@+id/refreshBookingsBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Refresh"
+                        android:textColor="@color/primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:padding="6dp"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/bookingsEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No bookings yet."
+                    android:textColor="@color/ink_muted"
+                    android:textSize="13sp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"/>
+
+                <LinearLayout
+                    android:id="@+id/bookingsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

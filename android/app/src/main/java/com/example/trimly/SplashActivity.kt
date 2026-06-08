@@ -58,7 +58,7 @@ class SplashActivity : AppCompatActivity() {
             val seenOnboarding = getSharedPreferences("TrimlyPrefs", MODE_PRIVATE)
                 .getBoolean("ONBOARDING_SEEN", false)
             val next = when {
-                session != null -> HomeActivity::class.java
+                session != null -> destinationForCurrentUser()
                 !seenOnboarding -> OnboardingActivity::class.java
                 else -> MainActivity::class.java
             }

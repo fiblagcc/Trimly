@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val session = SupabaseClient.client.auth.currentSessionOrNull()
             if (session != null) {
-                startActivity(Intent(this@MainActivity, HomeActivity::class.java))
+                startActivity(Intent(this@MainActivity, destinationForCurrentUser()))
                 finish()
             }
         }
@@ -73,8 +73,10 @@ class MainActivity : AppCompatActivity() {
                         .putString("USER_ROLE", profile?.role ?: "client")
                         .apply()
 
+                    val dest = if (profile?.role == "barber")
+                        BarberDashboardActivity::class.java else HomeActivity::class.java
                     runOnUiThread {
-                        startActivity(Intent(this@MainActivity, HomeActivity::class.java))
+                        startActivity(Intent(this@MainActivity, dest))
                         finish()
                     }
 
@@ -82,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         loginBtn.isEnabled = true
                         loginBtn.text = "Login"
-                        Toast.makeText(this@MainActivity, e.message ?: "Login failed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, friendlyError(e, "Login failed"), Toast.LENGTH_LONG).show()
                     }
                 }
             }

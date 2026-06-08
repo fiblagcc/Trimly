@@ -90,9 +90,11 @@ class RegisterActivity : AppCompatActivity() {
                     prefs.edit().putString("USER_NAME", name).apply()
                     prefs.edit().putString("USER_ROLE", selectedRole).apply()
 
+                    val dest = if (selectedRole == "Barber")
+                        BarberDashboardActivity::class.java else HomeActivity::class.java
                     runOnUiThread {
                         Toast.makeText(this@RegisterActivity, "Account created!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this@RegisterActivity, HomeActivity::class.java))
+                        startActivity(Intent(this@RegisterActivity, dest))
                         finish()
                     }
 
@@ -100,7 +102,7 @@ class RegisterActivity : AppCompatActivity() {
                     runOnUiThread {
                         registerBtn.isEnabled = true
                         registerBtn.text = "Create Account"
-                        Toast.makeText(this@RegisterActivity, e.message ?: "Registration failed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@RegisterActivity, friendlyError(e, "Registration failed"), Toast.LENGTH_LONG).show()
                     }
                 }
             }

@@ -350,6 +350,8 @@
 
                 <TextView
                     android:id="@+id/labelHome"
+                    android:singleLine="true"
+                    android:maxLines="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Home"
@@ -390,6 +392,8 @@
 
                 <TextView
                     android:id="@+id/labelBookings"
+                    android:singleLine="true"
+                    android:maxLines="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Bookings"
@@ -430,6 +434,8 @@
 
                 <TextView
                     android:id="@+id/labelFavorites"
+                    android:singleLine="true"
+                    android:maxLines="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Favorites"
@@ -470,6 +476,8 @@
 
                 <TextView
                     android:id="@+id/labelProfile"
+                    android:singleLine="true"
+                    android:maxLines="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Profile"

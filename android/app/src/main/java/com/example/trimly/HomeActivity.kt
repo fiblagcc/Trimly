@@ -311,10 +311,16 @@ class HomeActivity : AppCompatActivity() {
 
     private fun setNavActive(activeId: Int) {
         navItems.forEach { n ->
+            val slot = findViewById<LinearLayout>(n.slot)
             val pill = findViewById<LinearLayout>(n.pill)
             val icon = findViewById<AppCompatImageView>(n.icon)
             val label = findViewById<TextView>(n.label)
-            if (n.slot == activeId) {
+            val active = n.slot == activeId
+            // Active tab expands to fit its label on one line; inactive shrink to icon only.
+            val lp = slot.layoutParams as LinearLayout.LayoutParams
+            if (active) { lp.width = 0; lp.weight = 1f } else { lp.width = LinearLayout.LayoutParams.WRAP_CONTENT; lp.weight = 0f }
+            slot.layoutParams = lp
+            if (active) {
                 pill.setBackgroundResource(R.drawable.bg_nav_pill)
                 icon.setColorFilter(Color.WHITE)
                 label.visibility = View.VISIBLE

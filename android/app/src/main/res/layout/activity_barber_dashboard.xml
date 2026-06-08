@@ -289,28 +289,28 @@
         <LinearLayout android:id="@+id/bnavShop" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="horizontal" android:gravity="center" android:clickable="true" android:focusable="true">
             <LinearLayout android:id="@+id/bpillShop" android:layout_width="wrap_content" android:layout_height="44dp" android:orientation="horizontal" android:gravity="center" android:paddingLeft="14dp" android:paddingRight="14dp">
                 <androidx.appcompat.widget.AppCompatImageView android:id="@+id/bicoShop" android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_home" app:tint="@color/ink_faint"/>
-                <TextView android:id="@+id/blblShop" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Shop" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
+                <TextView android:id="@+id/blblShop" android:singleLine="true" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Shop" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout android:id="@+id/bnavBookings" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="horizontal" android:gravity="center" android:clickable="true" android:focusable="true">
             <LinearLayout android:id="@+id/bpillBookings" android:layout_width="wrap_content" android:layout_height="44dp" android:orientation="horizontal" android:gravity="center" android:paddingLeft="14dp" android:paddingRight="14dp">
                 <androidx.appcompat.widget.AppCompatImageView android:id="@+id/bicoBookings" android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_calendar" app:tint="@color/ink_faint"/>
-                <TextView android:id="@+id/blblBookings" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bookings" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
+                <TextView android:id="@+id/blblBookings" android:singleLine="true" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bookings" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout android:id="@+id/bnavSchedule" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="horizontal" android:gravity="center" android:clickable="true" android:focusable="true">
             <LinearLayout android:id="@+id/bpillSchedule" android:layout_width="wrap_content" android:layout_height="44dp" android:orientation="horizontal" android:gravity="center" android:paddingLeft="14dp" android:paddingRight="14dp">
                 <androidx.appcompat.widget.AppCompatImageView android:id="@+id/bicoSchedule" android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_settings" app:tint="@color/ink_faint"/>
-                <TextView android:id="@+id/blblSchedule" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Schedule" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
+                <TextView android:id="@+id/blblSchedule" android:singleLine="true" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Schedule" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout android:id="@+id/bnavServices" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="horizontal" android:gravity="center" android:clickable="true" android:focusable="true">
             <LinearLayout android:id="@+id/bpillServices" android:layout_width="wrap_content" android:layout_height="44dp" android:orientation="horizontal" android:gravity="center" android:paddingLeft="14dp" android:paddingRight="14dp">
                 <androidx.appcompat.widget.AppCompatImageView android:id="@+id/bicoServices" android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_scissors" app:tint="@color/ink_faint"/>
-                <TextView android:id="@+id/blblServices" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Services" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
+                <TextView android:id="@+id/blblServices" android:singleLine="true" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Services" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:layout_marginStart="6dp" android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>
 

@@ -341,22 +341,28 @@ class BarberDashboardActivity : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.bnavServices).setOnClickListener { switchTab("Services") }
     }
 
-    private data class BTab(val name: String, val section: Int, val pill: Int, val ico: Int, val lbl: Int)
+    private data class BTab(val name: String, val slot: Int, val section: Int, val pill: Int, val ico: Int, val lbl: Int)
 
     private val bTabs = listOf(
-        BTab("Shop", R.id.sectionShop, R.id.bpillShop, R.id.bicoShop, R.id.blblShop),
-        BTab("Bookings", R.id.sectionBookings, R.id.bpillBookings, R.id.bicoBookings, R.id.blblBookings),
-        BTab("Schedule", R.id.sectionSchedule, R.id.bpillSchedule, R.id.bicoSchedule, R.id.blblSchedule),
-        BTab("Services", R.id.sectionServices, R.id.bpillServices, R.id.bicoServices, R.id.blblServices)
+        BTab("Shop", R.id.bnavShop, R.id.sectionShop, R.id.bpillShop, R.id.bicoShop, R.id.blblShop),
+        BTab("Bookings", R.id.bnavBookings, R.id.sectionBookings, R.id.bpillBookings, R.id.bicoBookings, R.id.blblBookings),
+        BTab("Schedule", R.id.bnavSchedule, R.id.sectionSchedule, R.id.bpillSchedule, R.id.bicoSchedule, R.id.blblSchedule),
+        BTab("Services", R.id.bnavServices, R.id.sectionServices, R.id.bpillServices, R.id.bicoServices, R.id.blblServices)
     )
 
     private fun switchTab(tab: String) {
         bTabs.forEach { t ->
             findViewById<View>(t.section).visibility = if (t.name == tab) View.VISIBLE else View.GONE
+            val slot = findViewById<LinearLayout>(t.slot)
             val pill = findViewById<LinearLayout>(t.pill)
             val ico = findViewById<AppCompatImageView>(t.ico)
             val lbl = findViewById<TextView>(t.lbl)
-            if (t.name == tab) {
+            val active = t.name == tab
+            // Active tab expands to fit its label on one line; inactive shrink to icon only.
+            val lp = slot.layoutParams as LinearLayout.LayoutParams
+            if (active) { lp.width = 0; lp.weight = 1f } else { lp.width = LinearLayout.LayoutParams.WRAP_CONTENT; lp.weight = 0f }
+            slot.layoutParams = lp
+            if (active) {
                 pill.setBackgroundResource(R.drawable.bg_nav_pill)
                 ico.setColorFilter(Color.WHITE)
                 lbl.visibility = View.VISIBLE

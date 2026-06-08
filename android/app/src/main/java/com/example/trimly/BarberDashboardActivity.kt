@@ -19,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import io.github.jan.supabase.auth.auth
@@ -89,6 +90,9 @@ class BarberDashboardActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.refreshBookingsBtn).setOnClickListener { loadBookings() }
         findViewById<MaterialButton>(R.id.addServiceBtn).setOnClickListener { showServiceDialog(null) }
         findViewById<MaterialButton>(R.id.saveHoursBtn).setOnClickListener { saveHours() }
+
+        setupBarberNav()
+        switchTab("Shop")
 
         loadShop()
     }
@@ -325,6 +329,48 @@ class BarberDashboardActivity : AppCompatActivity() {
                 })
             }
             container.addView(row)
+        }
+    }
+
+    // ---- Bottom nav (tabs) ----
+
+    private fun setupBarberNav() {
+        findViewById<LinearLayout>(R.id.bnavShop).setOnClickListener { switchTab("Shop") }
+        findViewById<LinearLayout>(R.id.bnavBookings).setOnClickListener { switchTab("Bookings") }
+        findViewById<LinearLayout>(R.id.bnavSchedule).setOnClickListener { switchTab("Schedule") }
+        findViewById<LinearLayout>(R.id.bnavServices).setOnClickListener { switchTab("Services") }
+    }
+
+    private data class BTab(val name: String, val section: Int, val pill: Int, val ico: Int, val lbl: Int)
+
+    private val bTabs = listOf(
+        BTab("Shop", R.id.sectionShop, R.id.bpillShop, R.id.bicoShop, R.id.blblShop),
+        BTab("Bookings", R.id.sectionBookings, R.id.bpillBookings, R.id.bicoBookings, R.id.blblBookings),
+        BTab("Schedule", R.id.sectionSchedule, R.id.bpillSchedule, R.id.bicoSchedule, R.id.blblSchedule),
+        BTab("Services", R.id.sectionServices, R.id.bpillServices, R.id.bicoServices, R.id.blblServices)
+    )
+
+    private fun switchTab(tab: String) {
+        bTabs.forEach { t ->
+            findViewById<View>(t.section).visibility = if (t.name == tab) View.VISIBLE else View.GONE
+            val pill = findViewById<LinearLayout>(t.pill)
+            val ico = findViewById<AppCompatImageView>(t.ico)
+            val lbl = findViewById<TextView>(t.lbl)
+            if (t.name == tab) {
+                pill.setBackgroundResource(R.drawable.bg_nav_pill)
+                ico.setColorFilter(Color.WHITE)
+                lbl.visibility = View.VISIBLE
+            } else {
+                pill.background = null
+                ico.setColorFilter(Color.parseColor("#9A988F"))
+                lbl.visibility = View.GONE
+            }
+        }
+        findViewById<TextView>(R.id.barberSubtitle).text = when (tab) {
+            "Shop" -> "Shop & subscription"
+            "Bookings" -> "Incoming bookings"
+            "Schedule" -> "Availability & hours"
+            else -> "Services & prices"
         }
     }
 

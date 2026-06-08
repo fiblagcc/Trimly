@@ -74,7 +74,8 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        setNavActive(activeNavId)
+        activeNavId = R.id.navHome
+        setNavActive(R.id.navHome)
         refreshUnread()
     }
 
@@ -299,18 +300,28 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private data class NavItem(val slot: Int, val pill: Int, val icon: Int, val label: Int)
+
+    private val navItems = listOf(
+        NavItem(R.id.navHome, R.id.pillHome, R.id.iconHome, R.id.labelHome),
+        NavItem(R.id.navBookings, R.id.pillBookings, R.id.iconBookings, R.id.labelBookings),
+        NavItem(R.id.navFavorites, R.id.pillFavorites, R.id.iconFavorites, R.id.labelFavorites),
+        NavItem(R.id.navProfile, R.id.pillProfile, R.id.iconProfile, R.id.labelProfile)
+    )
+
     private fun setNavActive(activeId: Int) {
-        val navIds = listOf(R.id.navHome, R.id.navBookings, R.id.navFavorites, R.id.navProfile)
-        navIds.forEach { id ->
-            val nav = findViewById<LinearLayout>(id)
-            val icon = nav.getChildAt(0) as AppCompatImageView
-            val label = nav.getChildAt(1) as TextView
-            if (id == activeId) {
-                icon.setColorFilter(Color.parseColor("#1D9E75"))
-                label.setTextColor(Color.parseColor("#1D9E75"))
+        navItems.forEach { n ->
+            val pill = findViewById<LinearLayout>(n.pill)
+            val icon = findViewById<AppCompatImageView>(n.icon)
+            val label = findViewById<TextView>(n.label)
+            if (n.slot == activeId) {
+                pill.setBackgroundResource(R.drawable.bg_nav_pill)
+                icon.setColorFilter(Color.WHITE)
+                label.visibility = View.VISIBLE
             } else {
+                pill.background = null
                 icon.setColorFilter(Color.parseColor("#9A988F"))
-                label.setTextColor(Color.parseColor("#9A988F"))
+                label.visibility = View.GONE
             }
         }
     }

@@ -308,14 +308,16 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navbar -->
+    <!-- Bottom Navbar (pill style: active = teal pill + label, others = icon only) -->
     <LinearLayout
         android:id="@+id/navbar"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="68dp"
         android:orientation="horizontal"
         android:background="@color/surface"
         android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -325,23 +327,39 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home"
-                app:tint="@color/ink_faint"/>
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/pillHome"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Home"
-                android:textColor="@color/ink_faint"
-                android:textSize="10sp"
-                android:layout_marginTop="3dp"/>
+                android:layout_height="44dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconHome"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="@color/ink_faint"/>
+
+                <TextView
+                    android:id="@+id/labelHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Home"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="6dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -349,23 +367,39 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_calendar"
-                app:tint="@color/ink_faint"/>
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/pillBookings"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bookings"
-                android:textColor="@color/ink_faint"
-                android:textSize="10sp"
-                android:layout_marginTop="3dp"/>
+                android:layout_height="44dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconBookings"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/ink_faint"/>
+
+                <TextView
+                    android:id="@+id/labelBookings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bookings"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="6dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -373,23 +407,39 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_heart"
-                app:tint="@color/ink_faint"/>
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/pillFavorites"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Favorites"
-                android:textColor="@color/ink_faint"
-                android:textSize="10sp"
-                android:layout_marginTop="3dp"/>
+                android:layout_height="44dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconFavorites"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_heart"
+                    app:tint="@color/ink_faint"/>
+
+                <TextView
+                    android:id="@+id/labelFavorites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Favorites"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="6dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -397,23 +447,39 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_person"
-                app:tint="@color/ink_faint"/>
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/pillProfile"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textColor="@color/ink_faint"
-                android:textSize="10sp"
-                android:layout_marginTop="3dp"/>
+                android:layout_height="44dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconProfile"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/ink_faint"/>
+
+                <TextView
+                    android:id="@+id/labelProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profile"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="6dp"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

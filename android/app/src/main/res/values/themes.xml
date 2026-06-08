@@ -13,6 +13,15 @@
 
     <style name="Theme.Trimly" parent="Base.Theme.Trimly" />
 
+    <!-- Splash window: green from the very first frame so there's no sand->green flash. -->
+    <style name="Theme.Trimly.Launch" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/primary_dark</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter</item>
+    </style>
+
     <style name="Theme.Trimly.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/primary_dark</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>

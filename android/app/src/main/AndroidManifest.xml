@@ -21,7 +21,7 @@
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.Trimly">
+            android:theme="@style/Theme.Trimly.Launch">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

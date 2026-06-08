@@ -108,3 +108,37 @@ values (
   'open'
 )
 on conflict (id) do update set status = excluded.status;
+
+-- ── Phone-app features for the demo: a service menu, weekly hours, and a review on
+-- the active shop (Fade & Co.), so the client/barber parity is visible. Needs 0002. ──
+insert into public.services (barbershop_id, name, price_cents, duration_min, is_active)
+select 'aaaaaaaa-0000-4000-8000-0000000000a1', v.name, v.price_cents, v.duration_min, true
+from (values
+  ('Haircut', 3000, 30),
+  ('Beard trim', 1500, 15),
+  ('Haircut + beard', 4000, 45),
+  ('Hot towel shave', 3500, 30),
+  ('Kids cut', 2000, 30)
+) as v(name, price_cents, duration_min)
+where not exists (
+  select 1 from public.services s
+  where s.barbershop_id = 'aaaaaaaa-0000-4000-8000-0000000000a1' and s.name = v.name
+);
+
+-- Mon–Fri 9–7, Sat 9–6, Sun closed. Closed days still carry valid times for the check.
+insert into public.business_hours (barbershop_id, day_of_week, open_time, close_time, is_closed)
+select 'aaaaaaaa-0000-4000-8000-0000000000a1', d.dow,
+  '09:00'::time,
+  case when d.dow = 6 then '18:00' else '19:00' end::time,
+  (d.dow = 0)
+from (select generate_series(0, 6) as dow) d
+on conflict (barbershop_id, day_of_week) do nothing;
+
+insert into public.reviews (barbershop_id, client_id, appointment_id, rating, comment)
+select a.barbershop_id, a.client_id, a.id, 5,
+       'Sharp fade and a clean line-up. In and out on time, booking again.'
+from public.appointments a
+where a.barbershop_id = 'aaaaaaaa-0000-4000-8000-0000000000a1'
+order by a.created_at
+limit 1
+on conflict (client_id, appointment_id) do nothing;

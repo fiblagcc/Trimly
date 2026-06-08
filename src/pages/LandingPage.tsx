@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search } from 'lucide-react'
+import { Search, Smartphone } from 'lucide-react'
 import { TrimlyLogo } from '@/components/TrimlyLogo'
 import { Reveal } from '@/components/Reveal'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -10,6 +10,10 @@ import { Input } from '@/components/ui/input'
 // Verified to resolve. Given a teal editorial overlay in the markup below.
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1641318175316-795cd2db99f8?auto=format&fit=crop&w=1400&q=80'
+
+// Android app — APK published on the GitHub release. Tapping it downloads the .apk.
+const ANDROID_APK_URL =
+  'https://github.com/fiblagcc/Trimly/releases/download/demo-apk-20260608-005534/Trimly.apk'
 
 const STEPS = [
   { n: '01', title: 'Search your ZIP', body: 'See the barbers near you who are open for bookings right now.' },
@@ -65,6 +69,22 @@ export function LandingPage() {
             <p className="mt-3 text-sm text-ink/70">
               Trying the demo? Search <span className="font-semibold text-primary-dark">10001</span>.
             </p>
+
+            {/* Android app download — app-store-style pill. The one device moment. */}
+            <div className="mt-8 border-t border-ink/10 pt-6">
+              <a
+                href={ANDROID_APK_URL}
+                className="group inline-flex items-center gap-3 rounded-xl bg-dark-anchor px-5 py-3 text-white transition-all duration-150 hover:bg-dark-anchor/90 active:scale-[0.98]"
+              >
+                <Smartphone className="h-6 w-6 shrink-0" />
+                <span className="flex flex-col text-left leading-tight">
+                  <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-white/60">
+                    Download to your phone now
+                  </span>
+                  <span className="text-[15px] font-semibold">Get the Android app</span>
+                </span>
+              </a>
+            </div>
           </div>
 
           {/* Hero image with a teal editorial overlay. */}

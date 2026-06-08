@@ -56,7 +56,7 @@ data class MyShop(
 )
 
 @Serializable
-data class ClientRef(val full_name: String? = null, val phone: String? = null)
+data class ClientRef(val full_name: String? = null, val phone: String? = null, val email: String? = null)
 
 @Serializable
 data class BarberBooking(
@@ -498,7 +498,7 @@ class BarberDashboardActivity : AppCompatActivity() {
             try {
                 val list = SupabaseClient.client.from("appointments")
                     .select(
-                        Columns.raw("*, availability_slots(starts_at), client:profiles!appointments_client_id_fkey(full_name, phone)")
+                        Columns.raw("*, availability_slots(starts_at), client:profiles!appointments_client_id_fkey(full_name, phone, email)")
                     ) {
                         filter { eq("barbershop_id", shopId) }
                         order("created_at", Order.DESCENDING)
@@ -546,19 +546,30 @@ class BarberDashboardActivity : AppCompatActivity() {
     }
 
     private fun showBookingActions(b: BarberBooking) {
-        val labels = mutableListOf("Mark completed", "Cancel booking")
-        if (!b.client?.phone.isNullOrBlank()) labels.add("Call client")
+        val actions = mutableListOf<Pair<String, () -> Unit>>()
+        actions.add("Mark completed" to { updateStatus(b.id, "completed") })
+        actions.add("Cancel booking" to { updateStatus(b.id, "cancelled") })
+        val phone = b.client?.phone
+        val email = b.client?.email
+        if (!phone.isNullOrBlank()) actions.add("📞  Call  $phone" to { callClient(phone) })
+        if (!email.isNullOrBlank()) actions.add("✉️  Email  $email" to { emailClient(email) })
+        if (phone.isNullOrBlank() && email.isNullOrBlank())
+            actions.add("No contact info on file" to { toast("This client has no phone or email") })
+
+        val labels = actions.map { it.first }.toTypedArray()
         AlertDialog.Builder(this)
             .setTitle(b.client?.full_name ?: "Booking")
-            .setItems(labels.toTypedArray()) { _, which ->
-                when (labels[which]) {
-                    "Mark completed" -> updateStatus(b.id, "completed")
-                    "Cancel booking" -> updateStatus(b.id, "cancelled")
-                    "Call client" -> b.client?.phone?.let { callClient(it) }
-                }
-            }
+            .setItems(labels) { _, which -> actions[which].second() }
             .setNegativeButton("Close", null)
             .show()
+    }
+
+    private fun emailClient(email: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$email")))
+        } catch (e: Exception) {
+            toast("No email app found")
+        }
     }
 
     private fun updateStatus(id: String, status: String) {

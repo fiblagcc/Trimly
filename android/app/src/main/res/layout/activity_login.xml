@@ -24,7 +24,6 @@
             android:src="@drawable/trimly_logo"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Nombre -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +34,6 @@
             android:layout_gravity="center"
             android:letterSpacing="-0.02"/>
 
-        <!-- Tagline -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +44,6 @@
             android:layout_gravity="center"
             android:layout_marginBottom="44dp"/>
 
-        <!-- Label username -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +53,6 @@
             android:letterSpacing="0.08"
             android:layout_marginBottom="6dp"/>
 
-        <!-- Campo username -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +80,6 @@
                 android:paddingHorizontal="14dp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Label password -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -94,7 +89,6 @@
             android:letterSpacing="0.08"
             android:layout_marginBottom="6dp"/>
 
-        <!-- Campo password -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,7 +138,8 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:letterSpacing="0.02"
-            android:backgroundTint="@color/primary"            app:cornerRadius="12dp"
+            android:backgroundTint="@color/primary"
+            app:cornerRadius="12dp"
             android:layout_marginBottom="22dp"
             app:icon="@drawable/ic_arrow_right"
             app:iconGravity="textStart"/>

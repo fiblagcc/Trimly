@@ -1,11 +1,6 @@
 import { cn } from '@/lib/utils'
 
-// Loading placeholder - card-shaped, not a spinner (ART_DIRECTION §7).
+// Loading placeholder - a shimmer sweep, not a spinner.
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn('animate-pulse rounded-xl bg-ink/8', className)}
-      {...props}
-    />
-  )
+  return <div className={cn('shimmer rounded-xl', className)} {...props} />
 }

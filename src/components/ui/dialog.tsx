@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Lightweight modal (no Radix): backdrop, Escape to close, focus moved to the panel,
-// body scroll locked while open. Quiet fade per ART_DIRECTION §7.
+// Lightweight modal (no Radix): animated backdrop + spring panel, Escape to close,
+// focus moved to the panel, body scroll locked while open. AnimatePresence lets it
+// animate out too. Reduced-motion is honored globally via <MotionConfig>.
 export function Dialog({
   open,
   onOpenChange,
@@ -30,37 +32,44 @@ export function Dialog({
     }
   }, [open, onOpenChange])
 
-  if (!open) return null
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div
-        className="absolute inset-0 bg-ink/40 animate-[fadeIn_150ms_ease]"
-        onClick={() => onOpenChange(false)}
-      />
-      <div
-        ref={panelRef}
-        tabIndex={-1}
-        className={cn(
-          'relative z-10 w-full max-w-md rounded-card-lg border border-ink/8 bg-white p-6 outline-none',
-          'animate-[fadeUp_180ms_ease]'
-        )}
-      >
-        <button
-          type="button"
-          onClick={() => onOpenChange(false)}
-          aria-label="Close"
-          className="absolute right-4 top-4 rounded-lg p-1 text-ink/55 transition-colors hover:bg-sand hover:text-ink"
+    <AnimatePresence>
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
         >
-          <X className="h-4 w-4" />
-        </button>
-        {children}
-      </div>
-    </div>
+          <motion.div
+            className="absolute inset-0 bg-ink/40 backdrop-blur-[2px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => onOpenChange(false)}
+          />
+          <motion.div
+            ref={panelRef}
+            tabIndex={-1}
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 8 }}
+            transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+            className={cn('card-elevated relative z-10 w-full max-w-md p-6 outline-none')}
+          >
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 rounded-lg p-1 text-ink/55 transition-colors hover:bg-sand hover:text-ink"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            {children}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 }
 

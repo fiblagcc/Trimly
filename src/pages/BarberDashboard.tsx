@@ -39,6 +39,7 @@ import type { Barbershop, BusinessHour, Service } from '@/lib/types'
 import { useBookingRealtime } from '@/lib/realtime'
 import { formatDateTime, formatPrice, DAY_NAMES_LONG } from '@/lib/format'
 import { BarberCalendar } from '@/components/BarberCalendar'
+import { SidebarRail } from '@/components/SidebarRail'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -73,44 +74,32 @@ export function BarberDashboard() {
   useBookingRealtime(shop?.id)
 
   return (
-    <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-10 lg:flex-row lg:gap-12">
+    <div className="mx-auto flex max-w-[1280px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:gap-8 lg:py-8">
       <aside className="lg:w-60 lg:shrink-0">
-        <div className="rounded-card-lg bg-dark-anchor p-6 text-white lg:sticky lg:top-24">
-          <p className="label-section !text-white/60">Signed in as</p>
-          <p className="mt-1 truncate font-display text-xl text-white">
-            {shop?.shop_name || profile?.full_name || 'Your shop'}
-          </p>
-          <div className="mt-2">
-            {shop ? (
-              <Badge variant={shop.is_active ? 'active' : 'inactive'}>
-                {shop.is_active ? 'Live' : 'Not subscribed'}
-              </Badge>
-            ) : (
-              <Badge variant="pending">Setup needed</Badge>
-            )}
-          </div>
-
-          <nav className="mt-6 flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
-            {NAV.map(({ id, label, icon: Icon }) => {
-              const active = section === id
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  aria-current={active ? 'page' : undefined}
-                  onClick={() => setSection(id)}
-                  className={
-                    'flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-left text-sm font-medium transition-colors duration-150 ' +
-                    (active ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white')
-                  }
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </button>
-              )
-            })}
-          </nav>
-        </div>
+        <SidebarRail
+          nav={NAV}
+          active={section}
+          onNavigate={(id) => setSection(id as Section)}
+          top={
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/45">
+                Signed in as
+              </p>
+              <p className="mt-1 truncate font-display text-xl text-white">
+                {shop?.shop_name || profile?.full_name || 'Your shop'}
+              </p>
+              <div className="mt-2">
+                {shop ? (
+                  <Badge variant={shop.is_active ? 'active' : 'inactive'}>
+                    {shop.is_active ? 'Live' : 'Not subscribed'}
+                  </Badge>
+                ) : (
+                  <Badge variant="pending">Setup needed</Badge>
+                )}
+              </div>
+            </div>
+          }
+        />
       </aside>
 
       <div className="min-w-0 flex-1">

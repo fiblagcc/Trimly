@@ -20,8 +20,8 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-sand">
-      <header className="sticky top-0 z-40 border-b border-ink/8 bg-sand/85 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
+      <header className="sticky top-0 z-40 border-b border-ink/8 bg-sand/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 sm:px-6">
           <Link to="/" aria-label="Trimly home">
             <TrimlyLogo size="nav" />
           </Link>

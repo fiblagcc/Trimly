@@ -46,6 +46,13 @@
 
 /* ─── Base Styles ──────────────────────────────────────────── */
 
+/* Always reserve the scrollbar gutter so pages with and without a scrollbar do not
+   shift horizontally as content changes. */
+html {
+  scrollbar-gutter: stable;
+  background-color: var(--color-sand);
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-sand);

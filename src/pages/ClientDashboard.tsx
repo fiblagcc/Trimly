@@ -24,6 +24,7 @@ import {
 import type { AvailabilitySlot, Barbershop, BusinessHour, Review } from '@/lib/types'
 import { SERVICES } from '@/lib/types'
 import { formatDateTime, formatPrice, formatClock, DAY_NAMES_LONG, directionsUrl } from '@/lib/format'
+import { Reveal, Stagger, StaggerItem } from '@/components/Reveal'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -103,7 +104,15 @@ function RatingInline({ shopId }: { shopId: string }) {
   )
 }
 
-function FavHeart({ shopId, size = 'md' }: { shopId: string; size?: 'sm' | 'md' }) {
+function FavHeart({
+  shopId,
+  size = 'md',
+  className = '',
+}: {
+  shopId: string
+  size?: 'sm' | 'md'
+  className?: string
+}) {
   const { session } = useAuth()
   const userId = session?.user.id
   const { data: favs } = useFavorites(userId)
@@ -120,8 +129,10 @@ function FavHeart({ shopId, size = 'md' }: { shopId: string; size?: 'sm' | 'md' 
         toggle.mutate({ shopId, on: !on })
       }}
       className={
-        'inline-flex shrink-0 items-center justify-center rounded-full border border-ink/10 bg-white/70 transition-colors hover:border-primary/40 ' +
-        px
+        'inline-flex shrink-0 items-center justify-center rounded-full border border-ink/10 bg-white/70 transition-colors hover:border-primary/40 active:scale-95 ' +
+        px +
+        ' ' +
+        className
       }
     >
       <Heart className={'h-4 w-4 ' + (on ? 'fill-primary text-primary' : 'text-ink/45')} />
@@ -129,16 +140,23 @@ function FavHeart({ shopId, size = 'md' }: { shopId: string; size?: 'sm' | 'md' 
   )
 }
 
+// A shop result card. The whole card is the click target (a stretched overlay
+// button), while the save-heart sits above it as its own control - no nested
+// buttons, valid HTML, and both are keyboard reachable.
 function ShopCard({ shop, onSelect }: { shop: Barbershop; onSelect: (s: Barbershop) => void }) {
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(shop)}
-      className="editorial-card text-left transition-transform duration-150 hover:-translate-y-0.5"
-    >
+    <StaggerItem className="editorial-card group relative flex flex-col transition-transform duration-150 hover:-translate-y-0.5">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="heading-section">{shop.shop_name}</h3>
-        <FavHeart shopId={shop.id} size="sm" />
+        <h3 className="heading-section">
+          <button
+            type="button"
+            onClick={() => onSelect(shop)}
+            className="rounded-sm text-left outline-none after:absolute after:inset-0 after:rounded-card-lg after:content-[''] focus-visible:ring-2 focus-visible:ring-primary/40"
+          >
+            {shop.shop_name}
+          </button>
+        </h3>
+        <FavHeart shopId={shop.id} size="sm" className="relative z-10" />
       </div>
       <div className="mt-2">
         <RatingInline shopId={shop.id} />
@@ -146,10 +164,13 @@ function ShopCard({ shop, onSelect }: { shop: Barbershop; onSelect: (s: Barbersh
       {shop.bio && <p className="mt-2 line-clamp-2 text-sm text-ink/70">{shop.bio}</p>}
       {shop.address && (
         <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
-          <MapPin className="h-3.5 w-3.5" /> {shop.address}
+          <MapPin className="h-3.5 w-3.5 shrink-0" /> {shop.address}
         </p>
       )}
-    </button>
+      <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-dark opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+        View times <ArrowLeft className="h-3.5 w-3.5 rotate-180" />
+      </span>
+    </StaggerItem>
   )
 }
 
@@ -175,10 +196,15 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
     setZip(zipInput.trim() || null)
   }
 
+  const runDemo = () => {
+    setZipInput('10001')
+    setZip('10001')
+  }
+
   return (
     <div>
       <div className="max-w-2xl">
-        <h1 className="heading-page">Find a barber near you.</h1>
+        <h1 className="heading-page text-balance">Find a barber near you.</h1>
         <p className="mt-3 text-lg text-ink/70">
           Enter your ZIP code to see barbers taking bookings in your area.
         </p>
@@ -203,9 +229,9 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
         </p>
       </div>
 
-      <div className="mt-12">
+      <div className="mt-10">
         {zip === null ? (
-          <PreSearchGuide />
+          <PreSearchGuide onDemo={runDemo} />
         ) : isFetching ? (
           <CardGridSkeleton />
         ) : isError ? (
@@ -227,11 +253,11 @@ function SearchView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
             <p className="label-section mb-4">
               {shops.length} barber{shops.length > 1 ? 's' : ''} in {zip}
             </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {shops.map((shop) => (
                 <ShopCard key={shop.id} shop={shop} onSelect={onSelect} />
               ))}
-            </div>
+            </Stagger>
           </>
         )}
       </div>
@@ -253,42 +279,51 @@ function SavedView({ onSelect }: { onSelect: (s: Barbershop) => void }) {
         {isLoading ? (
           <CardGridSkeleton />
         ) : !shops || shops.length === 0 ? (
-          <div className="editorial-card max-w-md">
-            <p className="font-medium text-ink">Nothing saved yet.</p>
-            <p className="mt-1 text-sm text-ink/70">Find a barber and tap the heart to save them for later.</p>
-          </div>
+          <Reveal className="editorial-card flex max-w-xl items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-badge-active-bg text-primary-dark">
+              <Heart className="h-6 w-6" />
+            </span>
+            <div>
+              <p className="font-medium text-ink">Nothing saved yet.</p>
+              <p className="mt-1 text-sm text-ink/70">
+                Find a barber and tap the heart to save them for later.
+              </p>
+            </div>
+          </Reveal>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {shops.map((shop) => (
               <ShopCard key={shop.id} shop={shop} onSelect={onSelect} />
             ))}
-          </div>
+          </Stagger>
         )}
       </div>
     </div>
   )
 }
 
-const GUIDE = [
-  { n: '01', title: 'Search your ZIP', body: 'See the barbers near you taking bookings right now.' },
-  { n: '02', title: 'Pick a time', body: 'Choose an open slot and the service you want.' },
-  { n: '03', title: 'Show up sharp', body: 'Get directions on the day and skip the wait.' },
-]
-
-function PreSearchGuide() {
+// A logged-in client who hasn't searched yet: one calm, useful prompt with a
+// one-tap demo shortcut. (Not a numbered "how it works" rehash of the landing.)
+function PreSearchGuide({ onDemo }: { onDemo: () => void }) {
   return (
-    <div className="border-t border-ink/8 pt-10">
-      <p className="label-section">How booking works</p>
-      <div className="mt-6 grid gap-x-10 gap-y-8 sm:grid-cols-3">
-        {GUIDE.map((s) => (
-          <div key={s.n}>
-            <div className="font-display text-4xl font-semibold text-primary/30">{s.n}</div>
-            <h3 className="mt-2 font-medium text-ink">{s.title}</h3>
-            <p className="mt-1 text-sm text-ink/70">{s.body}</p>
-          </div>
-        ))}
+    <Reveal className="editorial-card flex max-w-xl flex-col items-start gap-4 sm:flex-row sm:items-center">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-badge-active-bg text-primary-dark">
+        <MapPin className="h-6 w-6" />
+      </span>
+      <div>
+        <p className="font-medium text-ink">Search a ZIP to see who’s open near you.</p>
+        <p className="mt-1 text-sm text-ink/70">
+          Active barbers show up here with their live open times, ratings, and prices.
+        </p>
+        <button
+          type="button"
+          onClick={onDemo}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-primary-dark active:scale-[0.98]"
+        >
+          <Search className="h-3.5 w-3.5" /> Try the demo: 10001
+        </button>
       </div>
-    </div>
+    </Reveal>
   )
 }
 
@@ -346,51 +381,102 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
       <button
         type="button"
         onClick={onBack}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink/70 hover:text-ink"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink/70 transition-colors hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" /> Back to results
       </button>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
-        {/* Shop info */}
-        <div>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <Badge variant="active">Active</Badge>
-                {openNow !== undefined && (
-                  <Badge variant={openNow ? 'active' : 'inactive'}>{openNow ? 'Open now' : 'Closed'}</Badge>
-                )}
+      {/* Shop identity: the one deep-teal anchor on the client layout. */}
+      <Reveal className="surface-anchor overflow-hidden rounded-card-lg px-6 py-7 text-white sm:px-8 sm:py-8">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="active">Active</Badge>
+              {openNow !== undefined && (
+                <Badge variant={openNow ? 'active' : 'inactive'}>{openNow ? 'Open now' : 'Closed'}</Badge>
+              )}
+            </div>
+            <h1 className="mt-3 font-display text-3xl font-semibold leading-tight sm:text-[2.5rem]">
+              {shop.shop_name}
+            </h1>
+            {rating && rating.review_count > 0 && (
+              <div className="mt-2.5 flex items-center gap-1.5 text-sm text-white/85">
+                <Star className="h-4 w-4 fill-accent text-accent" />
+                <span className="font-semibold text-white">{Number(rating.avg_rating).toFixed(1)}</span>
+                <span className="text-white/60">
+                  · {rating.review_count} review{rating.review_count > 1 ? 's' : ''}
+                </span>
               </div>
-              <h1 className="heading-page mt-3">{shop.shop_name}</h1>
-            </div>
-            <FavHeart shopId={shop.id} />
+            )}
+            {shop.bio && <p className="mt-3 max-w-prose text-white/75">{shop.bio}</p>}
+            {shop.address && (
+              <p className="mt-3 flex items-center gap-1.5 text-sm text-white/75">
+                <MapPin className="h-4 w-4 shrink-0" /> {shop.address}
+                {shop.zip ? `, ${shop.zip}` : ''}
+              </p>
+            )}
           </div>
+          <FavHeart shopId={shop.id} className="border-white/25 bg-white/10" />
+        </div>
+      </Reveal>
 
-          {rating && rating.review_count > 0 && (
-            <div className="mt-3 flex items-center gap-2">
-              <Stars value={Number(rating.avg_rating)} />
-              <span className="text-sm text-ink/70">
-                {Number(rating.avg_rating).toFixed(1)} · {rating.review_count} review
-                {rating.review_count > 1 ? 's' : ''}
-              </span>
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        {/* Booking panel: source-first so it leads on mobile, right column + sticky on desktop. */}
+        <div className="order-first lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-24">
+          <Reveal className="card-elevated p-6">
+            <div className="flex items-center justify-between">
+              <p className="label-section">Book a time</p>
+              {slots && slots.length > 0 && (
+                <span className="text-xs text-ink/55">
+                  {slots.length} slot{slots.length > 1 ? 's' : ''} open
+                </span>
+              )}
             </div>
-          )}
+            {isLoading ? (
+              <div className="mt-4 space-y-2">
+                <Skeleton className="h-14 w-full" />
+                <Skeleton className="h-14 w-full" />
+                <Skeleton className="h-14 w-full" />
+              </div>
+            ) : !slots || slots.length === 0 ? (
+              <p className="mt-4 text-sm text-ink/70">No open slots right now. Check back soon.</p>
+            ) : (
+              <Stagger className="mt-4 space-y-2" gap={0.05}>
+                {slots.map((slot) => (
+                  <StaggerItem key={slot.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPick(0)
+                        setPending(slot)
+                      }}
+                      className="group flex w-full items-center justify-between rounded-xl border border-ink/12 px-4 py-3 text-left transition-all duration-150 hover:border-primary hover:bg-badge-active-bg active:scale-[0.99]"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold text-ink">
+                          {formatDateTime(slot.starts_at)}
+                        </span>
+                        <span className="block text-xs text-ink/55">{slot.duration_min} min</span>
+                      </span>
+                      <CalendarCheck className="h-4 w-4 shrink-0 text-ink/25 transition-colors group-hover:text-primary" />
+                    </button>
+                  </StaggerItem>
+                ))}
+              </Stagger>
+            )}
+          </Reveal>
+        </div>
 
-          {shop.bio && <p className="mt-3 text-ink/70">{shop.bio}</p>}
-          {shop.address && (
-            <p className="mt-4 flex items-center gap-1.5 text-sm text-ink/70">
-              <MapPin className="h-4 w-4" /> {shop.address}
-              {shop.zip ? `, ${shop.zip}` : ''}
-            </p>
-          )}
-
-          <HoursList hours={hours ?? []} />
+        {/* Hours + services in the left column. */}
+        <div className="space-y-8 lg:col-start-1 lg:row-start-1">
+          <Reveal>
+            <HoursList hours={hours ?? []} />
+          </Reveal>
 
           {menu && menu.length > 0 && (
-            <div className="mt-6">
+            <Reveal>
               <p className="label-section mb-3">Services</p>
-              <ul className="divide-y divide-ink/8 overflow-hidden rounded-xl border border-ink/8 bg-white">
+              <ul className="divide-y divide-ink/8 overflow-hidden rounded-card border border-ink/8 bg-white">
                 {menu.map((s) => (
                   <li key={s.id} className="flex items-center justify-between px-4 py-3">
                     <div>
@@ -401,38 +487,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Open slots */}
-        <div className="editorial-card">
-          <p className="label-section mb-4">Open times</p>
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-11 w-full" />
-              <Skeleton className="h-11 w-full" />
-              <Skeleton className="h-11 w-full" />
-            </div>
-          ) : !slots || slots.length === 0 ? (
-            <p className="text-sm text-ink/70">No open slots right now. Check back soon.</p>
-          ) : (
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {slots.map((slot) => (
-                <button
-                  key={slot.id}
-                  type="button"
-                  onClick={() => {
-                    setPick(0)
-                    setPending(slot)
-                  }}
-                  className="rounded-xl border border-ink/15 px-4 py-3 text-left text-sm font-medium text-ink transition-colors duration-150 hover:border-primary hover:bg-badge-active-bg"
-                >
-                  {formatDateTime(slot.starts_at)}
-                  <span className="ml-1 font-normal text-ink/70">· {slot.duration_min} min</span>
-                </button>
-              ))}
-            </div>
+            </Reveal>
           )}
         </div>
       </div>
@@ -477,7 +532,7 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
 function HoursList({ hours }: { hours: BusinessHour[] }) {
   if (!hours.length) return null
   return (
-    <div className="mt-6">
+    <div>
       <p className="label-section mb-3 flex items-center gap-1.5">
         <Clock className="h-3.5 w-3.5" /> Hours
       </p>
@@ -505,14 +560,14 @@ function ReviewsList({ reviews }: { reviews: Review[] }) {
   return (
     <div className="mt-10 max-w-2xl">
       <p className="label-section mb-4">Reviews</p>
-      <ul className="space-y-3">
+      <Stagger className="space-y-3">
         {reviews.map((r) => (
-          <li key={r.id} className="editorial-card">
+          <StaggerItem key={r.id} className="editorial-card">
             <Stars value={r.rating} className="h-3.5 w-3.5" />
             {r.comment && <p className="mt-2 text-sm text-ink/80">{r.comment}</p>}
-          </li>
+          </StaggerItem>
         ))}
-      </ul>
+      </Stagger>
     </div>
   )
 }
@@ -524,33 +579,77 @@ function MyBookingsView() {
   const { data: reviewed } = useMyReviews(session?.user.id)
   const [review, setReview] = React.useState<MyBooking | null>(null)
 
+  // Split into what's ahead vs. what's behind, each sorted the way you'd read it.
+  const { upcoming, earlier } = React.useMemo(() => {
+    const now = new Date().getTime()
+    const up: MyBooking[] = []
+    const past: MyBooking[] = []
+    for (const b of bookings ?? []) {
+      const t = b.slot ? new Date(b.slot.starts_at).getTime() : 0
+      if (b.status !== 'cancelled' && t >= now) up.push(b)
+      else past.push(b)
+    }
+    up.sort((a, b) => new Date(a.slot?.starts_at ?? 0).getTime() - new Date(b.slot?.starts_at ?? 0).getTime())
+    past.sort((a, b) => new Date(b.slot?.starts_at ?? 0).getTime() - new Date(a.slot?.starts_at ?? 0).getTime())
+    return { upcoming: up, earlier: past }
+  }, [bookings])
+
+  const hasAny = (bookings?.length ?? 0) > 0
+
   return (
     <div>
       <h1 className="heading-page">My bookings</h1>
-      <p className="mt-1 text-ink/70">Your appointments, newest first.</p>
+      <p className="mt-1 text-ink/70">Your appointments, upcoming first.</p>
 
-      <div className="mt-6">
+      <div className="mt-6 max-w-2xl">
         {isLoading ? (
           <div className="space-y-3">
-            <Skeleton className="h-24 w-full max-w-2xl" />
-            <Skeleton className="h-24 w-full max-w-2xl" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
           </div>
-        ) : !bookings || bookings.length === 0 ? (
-          <div className="editorial-card max-w-md">
-            <p className="font-medium text-ink">No bookings yet.</p>
-            <p className="mt-1 text-sm text-ink/70">Find a barber and book your first slot.</p>
-          </div>
+        ) : !hasAny ? (
+          <Reveal className="editorial-card flex items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-badge-active-bg text-primary-dark">
+              <CalendarCheck className="h-6 w-6" />
+            </span>
+            <div>
+              <p className="font-medium text-ink">No bookings yet.</p>
+              <p className="mt-1 text-sm text-ink/70">Find a barber and book your first slot.</p>
+            </div>
+          </Reveal>
         ) : (
-          <ul className="max-w-2xl space-y-3">
-            {bookings.map((b) => (
-              <BookingRow
-                key={b.id}
-                booking={b}
-                reviewed={!!reviewed?.has(b.id)}
-                onReview={() => setReview(b)}
-              />
-            ))}
-          </ul>
+          <div className="space-y-8">
+            {upcoming.length > 0 && (
+              <section>
+                <p className="label-section mb-3">Upcoming</p>
+                <Stagger className="space-y-3">
+                  {upcoming.map((b) => (
+                    <BookingRow
+                      key={b.id}
+                      booking={b}
+                      reviewed={!!reviewed?.has(b.id)}
+                      onReview={() => setReview(b)}
+                    />
+                  ))}
+                </Stagger>
+              </section>
+            )}
+            {earlier.length > 0 && (
+              <section>
+                <p className="label-section mb-3">Earlier</p>
+                <Stagger className="space-y-3">
+                  {earlier.map((b) => (
+                    <BookingRow
+                      key={b.id}
+                      booking={b}
+                      reviewed={!!reviewed?.has(b.id)}
+                      onReview={() => setReview(b)}
+                    />
+                  ))}
+                </Stagger>
+              </section>
+            )}
+          </div>
         )}
       </div>
 
@@ -578,9 +677,9 @@ function BookingRow({
     b.status === 'confirmed' ? 'active' : b.status === 'completed' ? 'neutral' : 'inactive'
 
   return (
-    <li className="editorial-card flex flex-wrap items-center justify-between gap-4">
+    <StaggerItem className="editorial-card flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-4">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-badge-active-bg text-primary-dark">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-badge-active-bg text-primary-dark">
           <CalendarCheck className="h-5 w-5" />
         </span>
         <div>
@@ -611,7 +710,7 @@ function BookingRow({
           </a>
         )}
       </div>
-    </li>
+    </StaggerItem>
   )
 }
 

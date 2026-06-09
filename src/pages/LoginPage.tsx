@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { useAuth, dashboardPath } from '@/lib/auth'
@@ -20,6 +21,8 @@ const ROLE_OPTIONS: { value: Role; label: string; hint: string }[] = [
 // Barbershop brand panel image (Unsplash License, verified). Same shot as the landing.
 const LOGIN_IMAGE =
   'https://images.unsplash.com/photo-1641318175316-795cd2db99f8?auto=format&fit=crop&w=1200&q=80'
+
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 // Never let an auth call hang the form forever. If the network or auth lock stalls,
 // reject after a bounded wait so the button recovers and shows a clear message.
@@ -109,13 +112,23 @@ export function LoginPage() {
       {/* Left: the form */}
       <div className="flex items-center justify-center bg-sand px-6 py-12">
         <div className="w-full max-w-md">
-          <div className="mb-8">
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+          >
             <Link to="/" aria-label="Trimly home">
               <TrimlyLogo size="auth" />
             </Link>
-          </div>
+          </motion.div>
 
-          <div className="editorial-card p-8">
+          <motion.div
+            className="editorial-card p-8"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.08, ease: EASE }}
+          >
           <div className="mb-6">
             <h1 className="heading-page">
               {mode === 'login' ? 'Welcome back' : 'Create your account'}
@@ -180,14 +193,16 @@ export function LoginPage() {
                       type="button"
                       onClick={() => setRole(opt.value)}
                       aria-pressed={role === opt.value}
-                      className={
-                        'rounded-xl border px-3 py-2.5 text-left transition-colors duration-150 ' +
-                        (role === opt.value
-                          ? 'border-primary bg-badge-active-bg'
-                          : 'border-ink/15 hover:border-ink/30')
-                      }
+                      className="relative rounded-xl border border-ink/15 px-3 py-2.5 text-left transition-colors duration-150 hover:border-ink/30"
                     >
-                      <span className="block text-sm font-medium text-ink">{opt.label}</span>
+                      {role === opt.value && (
+                        <motion.span
+                          layoutId="rolePill"
+                          className="absolute inset-0 rounded-xl border border-primary bg-badge-active-bg"
+                          transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                        />
+                      )}
+                      <span className="relative block text-sm font-medium text-ink">{opt.label}</span>
                     </button>
                   ))}
                 </div>
@@ -219,26 +234,39 @@ export function LoginPage() {
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>
           </p>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Right: brand panel, the one dark surface for this layout. */}
-      <aside className="relative hidden lg:block">
-        <img
+      <aside className="relative hidden overflow-hidden lg:block">
+        <motion.img
           src={LOGIN_IMAGE}
           alt="A barber at work in the chair"
           className="absolute inset-0 h-full w-full object-cover"
+          initial={{ scale: 1.12 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.6, ease: EASE }}
         />
         <div className="absolute inset-0 bg-primary-dark/40 mix-blend-multiply" aria-hidden="true" />
         <div className="absolute inset-0 bg-dark-anchor/40" aria-hidden="true" />
         <div className="relative flex h-full flex-col justify-end p-12">
-          <p className="max-w-sm font-display text-4xl font-semibold leading-tight text-white">
+          <motion.p
+            className="max-w-sm font-display text-4xl font-semibold leading-tight text-white"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
+          >
             Book a barber near you, skip the wait.
-          </p>
-          <p className="mt-4 max-w-xs text-white/70">
+          </motion.p>
+          <motion.p
+            className="mt-4 max-w-xs text-white/70"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35, ease: EASE }}
+          >
             Real open times from real shops, confirmed in a tap.
-          </p>
+          </motion.p>
         </div>
       </aside>
     </div>

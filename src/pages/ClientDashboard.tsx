@@ -167,9 +167,6 @@ function ShopCard({ shop, onSelect }: { shop: Barbershop; onSelect: (s: Barbersh
           <MapPin className="h-3.5 w-3.5 shrink-0" /> {shop.address}
         </p>
       )}
-      <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-dark opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-        View times <ArrowLeft className="h-3.5 w-3.5 rotate-180" />
-      </span>
     </StaggerItem>
   )
 }

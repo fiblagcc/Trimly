@@ -48,7 +48,7 @@ export function TabsList({ className, children }: { className?: string; children
     <div
       role="tablist"
       className={cn(
-        'inline-flex items-center gap-1 rounded-xl border border-ink/8 bg-white p-1 shadow-soft',
+        'inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-xl border border-ink/8 bg-white p-1 shadow-soft [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         className
       )}
     >
@@ -66,7 +66,7 @@ export function TabsTrigger({ value, children }: { value: string; children: Reac
       role="tab"
       aria-selected={selected}
       onClick={() => setValue(value)}
-      className="group relative rounded-lg px-4 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="group relative shrink-0 whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       {selected && (
         <motion.span

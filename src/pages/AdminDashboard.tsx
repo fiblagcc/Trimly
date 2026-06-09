@@ -5,7 +5,7 @@ import { CalendarCheck, Store, Users, Ticket, RefreshCw } from 'lucide-react'
 import { useTickets, useUpdateTicketStatus, useReport } from '@/lib/admin'
 import type { TicketStatus } from '@/lib/types'
 import { formatDate } from '@/lib/format'
-import { Reveal, staggerItem } from '@/components/Reveal'
+import { Reveal, Stagger, StaggerItem, staggerItem } from '@/components/Reveal'
 import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -162,61 +162,93 @@ function TicketsSection() {
           )}
         </div>
 
-        <div className="editorial-card">
-          {isLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : !tickets || tickets.length === 0 ? (
+        {isLoading ? (
+          <div className="editorial-card space-y-3">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : !tickets || tickets.length === 0 ? (
+          <div className="editorial-card">
             <p className="text-ink/70">No tickets yet.</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Opened by</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Change</TableHead>
-                </TableRow>
-              </TableHeader>
-              <motion.tbody
-                initial={reduce ? undefined : 'hidden'}
-                animate={reduce ? undefined : 'show'}
-                variants={{ show: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } } }}
-              >
-                {tickets.map((t) => (
-                  <motion.tr
-                    key={t.id}
-                    variants={staggerItem}
-                    className="border-b border-ink/8 last:border-0"
+          </div>
+        ) : (
+          <>
+            {/* Phone: a card per ticket, so nothing is clipped off the side of a table. */}
+            <Stagger className="space-y-3 sm:hidden">
+              {tickets.map((t) => (
+                <StaggerItem key={t.id} className="editorial-card">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-medium text-ink">{t.subject}</p>
+                    <Badge variant={STATUS_VARIANT[t.status]} className="shrink-0">
+                      {STATUS_LABEL[t.status]}
+                    </Badge>
+                  </div>
+                  <p className="mt-1.5 text-sm text-ink/60">
+                    {t.opener?.full_name ?? 'Unknown'} · {formatDate(t.created_at)}
+                  </p>
+                  <Select
+                    aria-label={`Change status for ${t.subject}`}
+                    className="mt-3 h-11 w-full text-sm"
+                    value={t.status}
+                    onChange={(e) => onChange(t.id, e.target.value as TicketStatus)}
                   >
-                    <TableCell className="font-medium text-ink">{t.subject}</TableCell>
-                    <TableCell>{t.opener?.full_name ?? 'Unknown'}</TableCell>
-                    <TableCell className="text-ink/70">{formatDate(t.created_at)}</TableCell>
-                    <TableCell>
-                      <Badge variant={STATUS_VARIANT[t.status]}>{STATUS_LABEL[t.status]}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        aria-label={`Change status for ${t.subject}`}
-                        className="h-9 w-36 text-xs"
-                        value={t.status}
-                        onChange={(e) => onChange(t.id, e.target.value as TicketStatus)}
-                      >
-                        <option value="open">Open</option>
-                        <option value="in_progress">In progress</option>
-                        <option value="closed">Closed</option>
-                      </Select>
-                    </TableCell>
-                  </motion.tr>
-                ))}
-              </motion.tbody>
-            </Table>
-          )}
-        </div>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="closed">Closed</option>
+                  </Select>
+                </StaggerItem>
+              ))}
+            </Stagger>
+
+            {/* Tablet and up: the full table. */}
+            <div className="editorial-card hidden sm:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Opened by</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Change</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <motion.tbody
+                  initial={reduce ? undefined : 'hidden'}
+                  animate={reduce ? undefined : 'show'}
+                  variants={{ show: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } } }}
+                >
+                  {tickets.map((t) => (
+                    <motion.tr
+                      key={t.id}
+                      variants={staggerItem}
+                      className="border-b border-ink/8 last:border-0"
+                    >
+                      <TableCell className="font-medium text-ink">{t.subject}</TableCell>
+                      <TableCell>{t.opener?.full_name ?? 'Unknown'}</TableCell>
+                      <TableCell className="text-ink/70">{formatDate(t.created_at)}</TableCell>
+                      <TableCell>
+                        <Badge variant={STATUS_VARIANT[t.status]}>{STATUS_LABEL[t.status]}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          aria-label={`Change status for ${t.subject}`}
+                          className="h-9 w-36 text-xs"
+                          value={t.status}
+                          onChange={(e) => onChange(t.id, e.target.value as TicketStatus)}
+                        >
+                          <option value="open">Open</option>
+                          <option value="in_progress">In progress</option>
+                          <option value="closed">Closed</option>
+                        </Select>
+                      </TableCell>
+                    </motion.tr>
+                  ))}
+                </motion.tbody>
+              </Table>
+            </div>
+          </>
+        )}
       </section>
     </Reveal>
   )

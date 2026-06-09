@@ -55,7 +55,10 @@ export function BarberCalendar({
   bookings: IncomingBooking[]
   slots: AvailabilitySlot[]
 }) {
-  const [view, setView] = React.useState<View>('week')
+  // Phones open on a single readable day; tablet and desktop open on the week.
+  const [view, setView] = React.useState<View>(() =>
+    typeof window !== 'undefined' && window.innerWidth < 768 ? 'day' : 'week'
+  )
   const [cursor, setCursor] = React.useState<Date>(() => new Date())
   const [dir, setDir] = React.useState(0)
   const scrollRef = React.useRef<HTMLDivElement>(null)

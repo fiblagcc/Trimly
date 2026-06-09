@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { Bell } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useNotifications, useMarkAllRead, useNotificationsRealtime } from '@/lib/notifications'
@@ -49,28 +50,36 @@ export function NotificationBell() {
         )}
       </button>
 
-      {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-card-lg border border-ink/10 bg-white shadow-[0_12px_40px_-12px_rgba(10,38,32,0.25)]">
-          <div className="border-b border-ink/8 px-4 py-2.5">
-            <p className="label-section">Notifications</p>
-          </div>
-          <div className="max-h-96 overflow-y-auto">
-            {!items || items.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-ink/55">No notifications yet.</p>
-            ) : (
-              <ul className="divide-y divide-ink/6">
-                {items.map((n) => (
-                  <li key={n.id} className={'px-4 py-3 ' + (n.is_read ? '' : 'bg-badge-active-bg/40')}>
-                    <p className="text-sm font-medium text-ink">{n.title}</p>
-                    {n.body && <p className="mt-0.5 text-sm text-ink/70">{n.body}</p>}
-                    <p className="mt-1 text-[11px] text-ink/45">{formatDateTime(n.created_at)}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            className="absolute right-0 z-50 mt-2 w-80 origin-top-right overflow-hidden rounded-card-lg border border-ink/10 bg-white shadow-[0_12px_40px_-12px_rgba(10,38,32,0.25)]"
+          >
+            <div className="border-b border-ink/8 px-4 py-2.5">
+              <p className="label-section">Notifications</p>
+            </div>
+            <div className="max-h-96 overflow-y-auto">
+              {!items || items.length === 0 ? (
+                <p className="px-4 py-10 text-center text-sm text-ink/55">No notifications yet.</p>
+              ) : (
+                <ul className="divide-y divide-ink/6">
+                  {items.map((n) => (
+                    <li key={n.id} className={'px-4 py-3 ' + (n.is_read ? '' : 'bg-badge-active-bg/40')}>
+                      <p className="text-sm font-medium text-ink">{n.title}</p>
+                      {n.body && <p className="mt-0.5 text-sm text-ink/70">{n.body}</p>}
+                      <p className="mt-1 text-[11px] text-ink/45">{formatDateTime(n.created_at)}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

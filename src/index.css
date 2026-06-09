@@ -102,11 +102,12 @@ body {
   border-radius: var(--radius-card-lg);
   border: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
   padding: 1.5rem;
-  transition: border-color 150ms ease;
+  transition: border-color 200ms ease, box-shadow 200ms var(--ease-out-quart);
 }
 
 .editorial-card:hover {
-  border-color: color-mix(in srgb, var(--color-ink) 16%, transparent);
+  border-color: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  box-shadow: var(--shadow-soft);
 }
 
 /* ─── Metric Numbers (display font, tabular) ───────────────── */

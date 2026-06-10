@@ -25,6 +25,7 @@ docs/
 
 # Local tooling and editor files
 .claude/
+CLAUDE.md
 
 # Editor directories and files
 .vscode/*

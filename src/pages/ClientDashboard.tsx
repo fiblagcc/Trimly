@@ -42,6 +42,14 @@ import {
 
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0] // Monday-first
 
+// Compact labels for the day-grouped booking panel (shown in the viewer's own tz).
+const timeLabel = (iso: string) =>
+  new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+const dayLabel = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+const dayKey = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' })
+
 export function ClientDashboard() {
   const [selectedShop, setSelectedShop] = React.useState<Barbershop | null>(null)
 
@@ -356,6 +364,21 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
     [menu]
   )
 
+  // Group the open slots by calendar day so a month of availability stays scannable.
+  const slotsByDay = React.useMemo(() => {
+    const order: string[] = []
+    const map = new Map<string, AvailabilitySlot[]>()
+    for (const s of slots ?? []) {
+      const k = dayKey(s.starts_at)
+      if (!map.has(k)) {
+        map.set(k, [])
+        order.push(k)
+      }
+      map.get(k)!.push(s)
+    }
+    return order.map((k) => ({ key: k, label: dayLabel(map.get(k)![0].starts_at), items: map.get(k)! }))
+  }, [slots])
+
   const confirm = async () => {
     if (!pending) return
     const opt = options[pick] ?? options[0]
@@ -431,35 +454,38 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
             </div>
             {isLoading ? (
               <div className="mt-4 space-y-2">
-                <Skeleton className="h-14 w-full" />
-                <Skeleton className="h-14 w-full" />
-                <Skeleton className="h-14 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
               </div>
             ) : !slots || slots.length === 0 ? (
               <p className="mt-4 text-sm text-ink/70">No open slots right now. Check back soon.</p>
             ) : (
-              <Stagger className="mt-4 space-y-2" gap={0.05}>
-                {slots.map((slot) => (
-                  <StaggerItem key={slot.id}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPick(0)
-                        setPending(slot)
-                      }}
-                      className="group flex w-full items-center justify-between rounded-xl border border-ink/12 px-4 py-3 text-left transition-all duration-150 hover:border-primary hover:bg-badge-active-bg active:scale-[0.99]"
-                    >
-                      <span className="min-w-0">
-                        <span className="block text-sm font-semibold text-ink">
-                          {formatDateTime(slot.starts_at)}
-                        </span>
-                        <span className="block text-xs text-ink/55">{slot.duration_min} min</span>
-                      </span>
-                      <CalendarCheck className="h-4 w-4 shrink-0 text-ink/25 transition-colors group-hover:text-primary" />
-                    </button>
-                  </StaggerItem>
+              <div className="scroll-area mt-4 max-h-[26rem] space-y-4 overflow-y-auto pr-1">
+                {slotsByDay.map((g) => (
+                  <div key={g.key}>
+                    <p className="sticky top-0 z-10 -mx-1 bg-white/95 px-1 py-1 text-xs font-semibold uppercase tracking-[0.04em] text-ink/55 backdrop-blur-sm">
+                      {g.label}
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap gap-2">
+                      {g.items.map((slot) => (
+                        <button
+                          key={slot.id}
+                          type="button"
+                          onClick={() => {
+                            setPick(0)
+                            setPending(slot)
+                          }}
+                          title={`${timeLabel(slot.starts_at)} · ${slot.duration_min} min`}
+                          className="rounded-lg border border-ink/12 px-3 py-1.5 text-sm font-medium text-ink transition-all duration-150 hover:border-primary hover:bg-badge-active-bg active:scale-[0.97]"
+                        >
+                          {timeLabel(slot.starts_at)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-              </Stagger>
+              </div>
             )}
           </Reveal>
         </div>

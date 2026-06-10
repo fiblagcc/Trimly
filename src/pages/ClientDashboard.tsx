@@ -398,13 +398,16 @@ function ShopDetail({ shop, onBack }: { shop: Barbershop; onBack: () => void }) 
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink/70 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back to results
-      </button>
+      {/* Sticky so the way back is always one click away, even deep in a long slot list. */}
+      <div className="sticky top-16 z-30 -mx-6 mb-4 border-b border-ink/8 bg-sand/85 px-6 py-3 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-ink/70 transition-colors hover:text-ink"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to results
+        </button>
+      </div>
 
       {/* Shop identity: the one deep-teal anchor on the client layout. */}
       <Reveal className="surface-anchor overflow-hidden rounded-card-lg px-6 py-7 text-white sm:px-8 sm:py-8">

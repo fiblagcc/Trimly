@@ -48,3 +48,6 @@ skills-lock.json
 
 # Native C# desktop app (local only, kept out of the public web repo)
 /Trimly Desktop/
+
+# Local brand exports (logo/icon renders) — generated, not shipped
+/brand-exports/
